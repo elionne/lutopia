@@ -75,18 +75,31 @@ function gradiant(left, right, pos, cross)
 
 end
 
-parled = {addr=0, rgb=rgb:new()}
-parled_mt = {__index=parled}
+light.parled = {addr=0, rgb=rgb:new()}
+light.parled_mt = {__index=light.parled}
 
-function parled:value() return math.max(self.rgb.r, self.rgb.g, self.rgb.b) end
-function parled:set_value(v) self.rgb = self.rgb:from_hsv({v=v}) end
-function parled:print()  self.rgb:print() end
-function parled:to_html() return self.rgb:to_html() end
+function light.parled:value()
+	return math.max(self.rgb.r, self.rgb.g, self.rgb.b)
+end
 
-function parled:new(addr, rgb)
+function light.parled:set_value(v)
+	self.rgb = self.rgb:from_hsv({v=v})
+end
+
+function light.parled:print()
+	self.rgb:print()
+end
+
+function light.parled:to_html()
+	return self.rgb:to_html()
+end
+
+function light.parled:new(addr, rgb)
 	local n = {addr=addr, rgb=rgb};
-	setmetatable(n, parled_mt);
+	setmetatable(n, light.parled_mt);
 	return n;
 end
 
-spot = {addr=0, value=0}
+light.spot = {addr=0, value=0}
+
+print("ok")
