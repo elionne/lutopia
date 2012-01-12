@@ -1,5 +1,3 @@
-/* gcc -ansi vt_lua.c -o vt_lua -llua */
-
 #include <stdio.h>
 #include <stdlib.h>
 
