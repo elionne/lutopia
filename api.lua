@@ -15,7 +15,7 @@ function rgb:to_hsv()
 	if max == 0 then s = 0 else s = 1 - min/max end
 	v = max;
 
-	return {h=h, s=s, v=v}	
+	return {h=h, s=s, v=v}
 end
 
 function rgb:from_hsv(new)
@@ -32,30 +32,31 @@ function rgb:from_hsv(new)
 	local m = v*(1 - f*s);
 	local n = v*(1 - (1 - f)*s);
 
-	if ti == 0 or ti == 6 then return rgb:new(v, n, l) end
-	if ti == 1 then return rgb:new(m, v, l) end
-	if ti == 2 then return rgb:new(l, v, n) end
-	if ti == 3 then return rgb:new(l, m, v) end
-	if ti == 4 then return rgb:new(n, l, v) end
-	if ti == 5 then return rgb:new(v, l, m) end
+	if ti == 0 or ti == 6 then return rgb.new(v, n, l) end
+	if ti == 1 then return rgb.new(m, v, l) end
+	if ti == 2 then return rgb.new(l, v, n) end
+	if ti == 3 then return rgb.new(l, m, v) end
+	if ti == 4 then return rgb.new(n, l, v) end
+	if ti == 5 then return rgb.new(v, l, m) end
 
-end
-
-function rgb:print()
-	print(self.r, self.g, self.b);
 end
 
 function rgb:to_html()
 	return string.format('#%02x%02x%02x', self.r*255, self.g*255, self.b*255) 
 end
 
-function rgb:new(r, g, b)
+function rgb:tostring()
+	return string.format('r=%f, g=%f, b=%f', self.r, self.g, self.b);
+end
+rgb_mt.__tostring = rgb.tostring;
+
+function rgb.new(r, g, b)
 	local n = {r=r, g=g, b=b};
 	setmetatable(n, rgb_mt);
 	return n;
 end
 
-function gradiant(left, right, pos, cross)
+function light.gradiant(left, right, pos, cross)
 
 	if cross == nil then cross = 0.5 end
 
@@ -71,11 +72,11 @@ function gradiant(left, right, pos, cross)
 	local g = grad_one(left.g, right.g);
 	local b = grad_one(left.b, right.b);
 
-	return rgb:new(r, g, b);
+	return rgb.new(r, g, b);
 
 end
 
-light.parled = {addr=0, rgb=rgb:new()}
+light.parled = {addr=0, rgb=rgb.new()}
 light.parled_mt = {__index=light.parled}
 
 function light.parled:value()
@@ -86,15 +87,13 @@ function light.parled:set_value(v)
 	self.rgb = self.rgb:from_hsv({v=v})
 end
 
-function light.parled:print()
-	self.rgb:print()
+function light.parled:tostring()
+	return self.rgb:tostring();
 end
 
-function light.parled:to_html()
-	return self.rgb:to_html()
-end
+light.parled_mt.__tostring = light.parled.tostring;
 
-function light.parled:new(addr, rgb)
+function light.parled.new(addr, rgb)
 	local n = {addr=addr, rgb=rgb};
 	setmetatable(n, light.parled_mt);
 	return n;
