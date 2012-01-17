@@ -107,7 +107,7 @@ void link_into_group(lua_State *L, const char *universe, const char *group,
 {
     lua_getglobal(L, universe);
     if( !lua_istable(L, -1) ){
-        printf("Internal error: global \"%s\"table is not defined\n", universe);
+        printf("Internal error: global \"%s\" table is not defined\n", universe);
         lua_pop(L, 1);
         goto error;
     }
@@ -156,8 +156,8 @@ int main()
     luaL_openlibs(L);
     
     new_global_light(L);
-    new_universe(L, "un1");
-    new_group(L, "un1", "group1");
+    new_universe(L, "u");
+    new_group(L, "u", "group1");
     
 
     err = luaL_loadfile(L, "api.lua");
@@ -165,8 +165,8 @@ int main()
     err = lua_pcall(L, 0, LUA_MULTRET, 0);
     dbg_lua(L, err, "api.lua");
 
-    new_light(L, 235, "un1", "parled", "test1");
-    link_into_group(L, "un1", "group1", "test1");
+    new_light(L, 235, "u", "parled", "test1");
+    link_into_group(L, "u", "group1", "test1");
 
     err = luaL_loadfile(L, "test.lua");
     dbg_lua(L, err, "test.lua");

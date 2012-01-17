@@ -12,17 +12,17 @@ for index, par in pairs(pars) do
 end
 --]]
 
-print('un1.test1', un1.test1);
-un1.test1.rgb.r = 0.345;
-print('un1.group1.test1', un1.group1.test1);
+print('un1.test1', u.test1);
+u.test1.rgb.r = 0.345;
+print('un1.group1.test1', u.group1.test1);
 
 a = rgb.new(0.25, 0.5, 0.75);
 b = rgb.new(0.6, 0.1, 0.2);
 
-for k,v in pairs(un1.test1) do print(k, v) end
+for k,v in pairs(u.test1) do print(k, v) end
 
-print(un1.test1.addr);
-print(un1.test1.rgb);
+print(u.test1.addr);
+print(u.test1.rgb);
 
 print(a:to_html())
 for i=1, 9 do
