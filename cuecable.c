@@ -53,15 +53,15 @@ int main(int argc, char *argv[])
         printf("error occurs when initialized usb\n");
         return -1;
     }
-    
+
     device_count = libusb_get_device_list(0, &all_usb);
-    
+
     for(device_index = 0; device_index < device_count; device_index++){
         libusb_device_handle *h;
         int err;
         int bus_number = libusb_get_bus_number(all_usb[device_index]);
         int device_addr= libusb_get_device_address(all_usb[device_index]);
-        
+
 
         err = libusb_open(all_usb[device_index], &h);
         if( err ){
@@ -74,14 +74,14 @@ int main(int argc, char *argv[])
             printf("device found %i,%i\n", bus_number, device_addr);
             break;
         }
-        
+
         libusb_close(h);
-        
+
     }
     libusb_free_device_list(all_usb, 0);
-    
+
     clear_features(cue);
-    
+
     err = libusb_bulk_transfer(cue,
                                LIBUSB_ENDPOINT_OUT, data, 2, &count_out, 200);
     if( err || count_out != 2 )
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
     if( err || count_out != 3 ){
         goto errors;
     }
-        
+
     printf("1 -- %hhx%hhx%hhx\n", data[0], data[1], data[2]);
 
     libusb_close(cue);
