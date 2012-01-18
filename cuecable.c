@@ -33,7 +33,6 @@ int clear_features(libusb_device_handle *h)
     if( err )
         return err;
 
-    usleep(1000);
     err = libusb_control_transfer(h, LIBUSB_ENDPOINT_OUT | LIBUSB_RECIPIENT_ENDPOINT
                                    , LIBUSB_REQUEST_CLEAR_FEATURE
                                    , 0x0000, 0x0081
@@ -74,6 +73,7 @@ int init_cuecable(libusb_device_handle *h)
         {{0}, 17}
     };
 
+    /* reset internal eeprom (suppose) */
     struct bulk bulk_init[] = {
         {{0x59, 0x00, 0x01, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x45}, 37},
         {{0x59, 0x00, 0x21, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x45}, 37},
@@ -109,7 +109,6 @@ int init_cuecable(libusb_device_handle *h)
         if( err || bytes_transferred != out->len )
             goto errors;
 
-        usleep(1000);
         err = libusb_bulk_transfer(h, LIBUSB_ENDPOINT_IN | 0x01
                                     , in->data, in->len
                                     , &bytes_transferred
@@ -123,6 +122,7 @@ int init_cuecable(libusb_device_handle *h)
 
     struct bulk *init = bulk_init;
 
+#if 0
     while(init->len){
         int bytes_transferred = 0;
 
@@ -133,10 +133,9 @@ int init_cuecable(libusb_device_handle *h)
         if( err || bytes_transferred != init->len )
             goto errors;
 
-        usleep(1000);
         init++;
     }
-
+#endif
     return 0;
 errors:
 
@@ -228,19 +227,10 @@ int main(int argc, char *argv[])
 
     err = init_cuecable(cue);
 
-    cue_dmx(cue, 0x02, 255);
-#if 0
-    err = libusb_bulk_transfer(cue,
-                               LIBUSB_ENDPOINT_OUT, data, 2, &count_out, 200);
-    if( err || count_out != 2 )
-        goto errors;
-
-    err = libusb_bulk_transfer(cue,
-                               LIBUSB_ENDPOINT_IN, data, 3, &count_out, 200);
-    if( err || count_out != 3 ){
-        goto errors;
-    }
-#endif
+    cue_sync(cue);
+    cue_dmx(cue, 0x02, 10);
+    cue_dmx(cue, 0x03, 10);
+    cue_dmx(cue, 0x04, 10);
 
     libusb_close(cue);
     libusb_exit(0);
