@@ -33,7 +33,8 @@ void dbg_lua(lua_State *L, int err, const char *msg)
     }
 }
 
-void new_light(lua_State *L, unsigned int addr, const char *universe, const char *type,
+void new_light(lua_State *L, unsigned int addr, const char *universe,
+                                                const char *type,
                                                 const char *name)
 {
     int err;
@@ -127,7 +128,7 @@ void link_into_group(lua_State *L, const char *universe, const char *group,
     }
 
     lua_setfield(L, -2, var);
-    
+
     /* pops 'universe' and 'group' from the stack */
     lua_pop(L, 2);
 
@@ -154,11 +155,11 @@ int main()
     int err;
 
     luaL_openlibs(L);
-    
+
     new_global_light(L);
     new_universe(L, "u");
     new_group(L, "u", "group1");
-    
+
 
     err = luaL_loadfile(L, "api.lua");
     dbg_lua(L, err, "api.lua");
