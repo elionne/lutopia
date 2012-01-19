@@ -7,7 +7,7 @@ function rgb:to_hsv()
 	local max = math.max(r, g, b);
 	local min = math.min(r, g, b);
 
-	if max == min then h = 0 
+	if max == min then h = 0
 	elseif max == r then h = (g-b)/(max-min)/6
 	elseif max == g then h = (b-r)/(max-min)/6 + 1/3
 	elseif max == b then h = (r-g)/(max-min)/6 + 2/3 end
@@ -19,7 +19,7 @@ function rgb:to_hsv()
 end
 
 function rgb:from_hsv(new)
-	
+
 	local old = self:to_hsv();
 	local h, s, v = new.h, new.s, new.v;
 
@@ -42,7 +42,7 @@ function rgb:from_hsv(new)
 end
 
 function rgb:to_html()
-	return string.format('#%02x%02x%02x', self.r*255, self.g*255, self.b*255) 
+	return string.format('#%02x%02x%02x', self.r*255, self.g*255, self.b*255)
 end
 
 function rgb:tostring()
@@ -60,7 +60,7 @@ function light.gradiant(left, right, pos, cross)
 
 	if cross == nil then cross = 0.5 end
 
-	local function grad_one(l, r) 
+	local function grad_one(l, r)
 		if pos < cross then
 			return (r - l)*pos/(2*cross) + l;
 		else
