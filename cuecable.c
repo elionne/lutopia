@@ -6,7 +6,8 @@
 
 #include <libusb-1.0/libusb.h>
 
-int test_vip_pid(libusb_device_handle *h, uint16_t vendor_id, uint16_t product_id)
+static int test_vip_pid(libusb_device_handle *h, uint16_t vendor_id,
+                                                 uint16_t product_id)
 {
     struct libusb_device_descriptor desc;
     unsigned char data[sizeof(desc)] = {0};
@@ -21,7 +22,7 @@ int test_vip_pid(libusb_device_handle *h, uint16_t vendor_id, uint16_t product_i
     return desc.idVendor == vendor_id && desc.idProduct == product_id;
 }
 
-int clear_features(libusb_device_handle *h)
+static int clear_features(libusb_device_handle *h)
 {
     int err;
 
@@ -46,12 +47,7 @@ int clear_features(libusb_device_handle *h)
 
 }
 
-int bulk_transfer(libusb_device_handle *h, unsigned char out[], size_t lout,
-                                           unsigned char in[], size_t lin)
-{
-}
-
-int init_cuecable(libusb_device_handle *h)
+static int cue_init(libusb_device_handle *h)
 {
     struct bulk{
         unsigned char data[37];
@@ -120,9 +116,9 @@ int init_cuecable(libusb_device_handle *h)
         out++;
     }
 
+#if 0
     struct bulk *init = bulk_init;
 
-#if 0
     while(init->len){
         int bytes_transferred = 0;
 
@@ -147,12 +143,11 @@ int cue_sync(libusb_device_handle *h)
 {
     unsigned char data[] = {0x48, 0x45};
     int bytes_transferred = 0;
-    int err;
 
-    err = libusb_bulk_transfer(h, LIBUSB_ENDPOINT_OUT | 0x01
-                                , data, 2
-                                , &bytes_transferred
-                                , 200);
+    return libusb_bulk_transfer(h, LIBUSB_ENDPOINT_OUT | 0x01
+                                 , data, 2
+                                 , &bytes_transferred
+                                 , 200);
 
 }
 
@@ -174,20 +169,18 @@ int cue_dmx(libusb_device_handle *h, uint16_t addr, unsigned char value)
 
 }
 
-int main(int argc, char *argv[])
+libusb_device_handle* cue_open()
 {
     libusb_device **all_usb;
     libusb_device_handle *cue = 0;
     int device_count, device_index;
 
-    unsigned char data[64] = {0x67, 0x45, 0};
     int err = 0;
-    int count_out;
 
     /* if any errors occurs) */
     if( libusb_init(0) ){
         printf("error occurs when initializing usb\n");
-        return -1;
+        return 0;
     }
 
     device_count = libusb_get_device_list(0, &all_usb);
@@ -217,28 +210,46 @@ int main(int argc, char *argv[])
     }
     libusb_free_device_list(all_usb, 0);
     if( cue == 0 )
-        goto errors;
+        return 0;
 
     err = clear_features(cue);
     if( err ){
         printf("couldn't clear cuecable (%i)\n", err);
-        goto errors;
+        return 0;
     }
 
-    err = init_cuecable(cue);
+    err = cue_init(cue);
+
+    return cue;
+}
+
+void cue_close(libusb_device_handle *cue)
+{
+    libusb_close(cue);
+    libusb_exit(0);
+
+}
+
+#ifdef EXEMPLE
+int main(int argc, char *argv[])
+{
+    libusb_device_handle *cue = 0;
+
+    cue = cue_open();
+    if( !cue )
+        goto errors;
 
     cue_sync(cue);
     cue_dmx(cue, 0x02, 10);
     cue_dmx(cue, 0x03, 10);
     cue_dmx(cue, 0x04, 10);
 
-    libusb_close(cue);
-    libusb_exit(0);
+    cue_close(cue);
     return 0;
 
 errors:
 
-    printf("couldn't send request. data(%i), err(%i)\n", count_out, err);
     printf("error occurs during transfere\n");
     return -1;
 }
+#endif
