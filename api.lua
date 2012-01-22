@@ -1,6 +1,14 @@
 rgb={r=0, g=0, b=0}
 rgb_mt={__index=rgb}
 
+function rgb:set(r, g, b)
+    self.r = r;
+    self.g = g;
+    self.b = b;
+
+    return self;
+end
+
 function rgb:to_hsv()
 	local r, g, b = self.r, self.g, self.b;
 	local h, s, v;
@@ -32,12 +40,12 @@ function rgb:from_hsv(new)
 	local m = v*(1 - f*s);
 	local n = v*(1 - (1 - f)*s);
 
-	if ti == 0 or ti == 6 then return rgb.new(v, n, l) end
-	if ti == 1 then return rgb.new(m, v, l) end
-	if ti == 2 then return rgb.new(l, v, n) end
-	if ti == 3 then return rgb.new(l, m, v) end
-	if ti == 4 then return rgb.new(n, l, v) end
-	if ti == 5 then return rgb.new(v, l, m) end
+	if ti == 0 or ti == 6 then return self:set(v, n, l) end
+	if ti == 1 then return self:set(m, v, l) end
+	if ti == 2 then return self:set(l, v, n) end
+	if ti == 3 then return self:set(l, m, v) end
+	if ti == 4 then return self:set(n, l, v) end
+	if ti == 5 then return self:set(v, l, m) end
 
 end
 
