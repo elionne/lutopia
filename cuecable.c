@@ -219,6 +219,7 @@ libusb_device_handle* cue_open()
     }
 
     err = cue_init(cue);
+    cue_sync(cue);
 
     return cue;
 }

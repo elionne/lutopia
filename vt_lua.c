@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <lua.h>
 #include <lauxlib.h>
+
+#include "cuecable.h"
 
 #define LIGHT "light"
 
@@ -150,6 +153,7 @@ void new_universe(lua_State *L, const char *universe)
 
 int main()
 {
+    libusb_device_handle* cue = cue_open();
     lua_State *L = luaL_newstate();
 
     int err;
@@ -174,6 +178,59 @@ int main()
     err = lua_pcall(L, 0, LUA_MULTRET, 0);
     dbg_lua(L, err, "test.lua");
 
+    int red, green, blue;
+    double p = 0;
+
+    for(p = 0; p <= 1 ; p += 0.002 ){
+        int err;
+
+        lua_getglobal(L, "main");
+        if( !lua_isfunction(L, -1) ){
+            printf("\"main\" function, is not defined\n");
+            break;
+        }
+        lua_pushnumber(L, p);
+        err = lua_pcall(L, 1, 0, 0);
+        dbg_lua(L, err, "main");
+
+        lua_getglobal(L, "u");
+        if( !lua_istable(L, -1) ){
+            printf("u not found\n");
+            break;
+        }
+        lua_getfield(L, -1, "test1");
+        if( !lua_istable(L, -1) ){
+            printf("light not found\n");
+            break;
+        }
+        lua_getfield(L, -1, "rgb");
+        if( !lua_istable(L, -1) ){
+            printf("is not a light\n");
+            break;
+        }
+        lua_getfield(L, -1, "r");
+        red = (int)(lua_tonumber(L, -1) * 255);
+
+        lua_pop(L, 1);
+        lua_getfield(L, -1, "g");
+        green = (int)(lua_tonumber(L, -1) * 255);
+
+        lua_pop(L, 1);
+        lua_getfield(L, -1, "b");
+        blue = (int)(lua_tonumber(L, -1) * 255);
+
+        lua_pop(L, 4);
+
+        cue_dmx(cue, 2, red);
+        cue_dmx(cue, 3, green);
+        cue_dmx(cue, 4, blue);
+        cue_sync(cue);
+
+        usleep(20000);
+
+    }
+
     lua_close(L);
+    cue_close(cue);
     return 0;
 }
