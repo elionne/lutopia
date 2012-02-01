@@ -105,6 +105,7 @@ static int cue_init(libusb_device_handle *h)
         if( err || bytes_transferred != out->len )
             goto errors;
 
+        usleep(1000);
         err = libusb_bulk_transfer(h, LIBUSB_ENDPOINT_IN | 0x01
                                     , in->data, in->len
                                     , &bytes_transferred
@@ -218,6 +219,7 @@ libusb_device_handle* cue_open()
         return 0;
     }
 
+    cue_sync(cue);
     err = cue_init(cue);
     cue_sync(cue);
 
