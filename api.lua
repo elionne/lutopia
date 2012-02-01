@@ -95,6 +95,11 @@ function light.parled:set_value(v)
 	self.rgb = self.rgb:from_hsv({v=v})
 end
 
+function light.parled:dmx()
+    return {addr=self.addr,
+            [2] = self.rgb.r, [3] = self.rgb.g, [4] = self.rgb.b};
+end
+
 function light.parled:tostring()
 	return self.rgb:tostring();
 end
@@ -108,5 +113,3 @@ function light.parled.new(addr, rgb)
 end
 
 light.spot = {addr=0, value=0}
-
-print("ok")
