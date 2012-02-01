@@ -226,7 +226,9 @@ int main()
         cue_dmx(cue, 4, blue);
         cue_sync(cue);
 
-        usleep(20000);
+        //printf("%g\r", p);
+        //fflush(stdout);
+        usleep(25000);
 
     }
 
