@@ -183,6 +183,7 @@ int main()
 
     for(p = 0; p <= 1 ; p += 0.002 ){
         int err;
+        short start_addr;
 
         lua_getglobal(L, "main");
         if( !lua_isfunction(L, -1) ){
@@ -203,28 +204,35 @@ int main()
             printf("light not found\n");
             break;
         }
-        lua_getfield(L, -1, "rgb");
-        if( !lua_istable(L, -1) ){
-            printf("is not a light\n");
+        lua_getfield(L, -1, "dmx");
+        if( !lua_isfunction(L, -1) ){
+            printf("no dmx function found\n");
             break;
         }
-        lua_getfield(L, -1, "r");
-        red = (int)(lua_tonumber(L, -1) * 255);
+        lua_pushvalue(L, -2);
+        err = lua_pcall(L, 1, 1, 0);
+        dbg_lua(L, err, "dmx");
+        if( !lua_istable(L, -1) ){
+            printf("error occurs when excuting dmx function\n");
+            break;
+        }
 
-        lua_pop(L, 1);
-        lua_getfield(L, -1, "g");
-        green = (int)(lua_tonumber(L, -1) * 255);
+        while( lua_next(L, -1) ){
+            if( lua_isstring(L, -2) ){
+                if( strcmp(lua_tostring(L, -2), "addr") )
+                    start_addr = lua_tointeger(L, -1);
+            }else if ( lua_isnumber(L, -2) ){
+                short index = lua_tointeger(L, -2);
+                char  value = (char)(lua_tonumber(L, -1) * 255);
 
-        lua_pop(L, 1);
-        lua_getfield(L, -1, "b");
-        blue = (int)(lua_tonumber(L, -1) * 255);
+                cue_dmx(cue, index, value);
+                cue_sync(cue);
+            }
 
-        lua_pop(L, 4);
+            lua_pop(L, -1);
+        }
+        lua_pop(L, 3);
 
-        cue_dmx(cue, 2, red);
-        cue_dmx(cue, 3, green);
-        cue_dmx(cue, 4, blue);
-        cue_sync(cue);
 
         //printf("%g\r", p);
         //fflush(stdout);
