@@ -116,3 +116,10 @@ function light.parled.new(addr, rgb)
 end
 
 light.spot = {addr=0, value=0}
+
+
+function light.spot:dmx()
+    return {addr=self.addr, [0] = value};
+end
+
+
