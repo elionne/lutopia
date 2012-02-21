@@ -99,7 +99,8 @@ end
 
 function light.parled:dmx()
     return {addr=self.addr,
-            [2] = self.rgb.r, [3] = self.rgb.g, [4] = self.rgb.b};
+            -- Start at 0
+            [1] = self.rgb.r, [2] = self.rgb.g, [3] = self.rgb.b};
 end
 
 function light.parled:tostring()
