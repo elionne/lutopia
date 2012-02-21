@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
+/* lua includes */
 #include <lua.h>
 #include <lauxlib.h>
 
@@ -151,6 +153,59 @@ void new_universe(lua_State *L, const char *universe)
     lua_setglobal(L, universe);
 }
 
+
+/* Light in use must be on the top of stack. when this function returns, current
+ * light still on stack.
+ */
+int send_dmx(lua_State *L, libusb_device_handle* cue)
+{
+    int err;
+    short start_addr;
+
+    lua_getfield(L, -1, "dmx");
+    if( !lua_isfunction(L, -1) ){
+        printf("no dmx function found\n");
+        return 0;
+    }
+
+    /* push self (light) parameter */
+    lua_pushvalue(L, -2);
+    err = lua_pcall(L, 1, 1, 0);
+    dbg_lua(L, err, "dmx");
+
+    if( !lua_istable(L, -1) ){
+        printf("error occurs when excuting dmx function\n");
+        return 0;
+    }
+
+    lua_getfield(L, -1, "addr");
+    if( !lua_isnumber(L, -1) ){
+        printf("no 'addr' field found, couldn't send dmx data.\n");
+        return 0;
+    }
+
+    start_addr = lua_tointeger(L, -1);
+    lua_pop(L, 1);
+
+    lua_pushnil(L);
+    while( lua_next(L, -2) ){
+        if( lua_isnumber(L, -2) ){
+            short index = lua_tointeger(L, -2);
+            char  value = (char)(lua_tonumber(L, -1) * 255);
+
+            //printf("addr %i, key : %i, value : %hhu\n", start_addr, index, value);
+
+            cue_dmx(cue, start_addr + index, value);
+            cue_sync(cue);
+        }
+        lua_pop(L, 1);
+    }
+
+    lua_pop(L, 1);
+
+    return 1;
+}
+
 int main()
 {
     libusb_device_handle* cue = cue_open();
@@ -170,7 +225,7 @@ int main()
     err = lua_pcall(L, 0, LUA_MULTRET, 0);
     dbg_lua(L, err, "api.lua");
 
-    new_light(L, 235, "u", "parled", "test1");
+    new_light(L, 1, "u", "parled", "test1");
     link_into_group(L, "u", "group1", "test1");
 
     err = luaL_loadfile(L, "test.lua");
@@ -178,12 +233,10 @@ int main()
     err = lua_pcall(L, 0, LUA_MULTRET, 0);
     dbg_lua(L, err, "test.lua");
 
-    int red, green, blue;
     double p = 0;
 
     for(p = 0; p <= 1 ; p += 0.002 ){
         int err;
-        short start_addr;
 
         lua_getglobal(L, "main");
         if( !lua_isfunction(L, -1) ){
@@ -199,50 +252,20 @@ int main()
             printf("u not found\n");
             break;
         }
+
         lua_getfield(L, -1, "test1");
         if( !lua_istable(L, -1) ){
-            printf("light not found\n");
+            printf("%s light not found\n", "test1");
             break;
         }
 
-        lua_getfield(L, -1, "dmx");
-        if( !lua_isfunction(L, -1) ){
-            printf("no dmx function found\n");
-            break;
-        }
-        lua_pushvalue(L, -2);
-        err = lua_pcall(L, 1, 1, 0);
-        dbg_lua(L, err, "dmx");
+        send_dmx(L, cue);
 
-        if( !lua_istable(L, -1) ){
-            printf("error occurs when excuting dmx function\n");
-            break;
-        }
-
-        lua_pushnil(L);
-        while( lua_next(L, -2) ){
-            if( lua_type(L, -2) == LUA_TSTRING ){
-                if( !strcmp(lua_tostring(L, -2), "addr") )
-                    start_addr = lua_tointeger(L, -1);
-            }else if ( lua_isnumber(L, -2) ){
-                short index = lua_tointeger(L, -2);
-                char  value = (char)(lua_tonumber(L, -1) * 255);
-
-                //printf("addr %i, key : %i, value : %i\n", start_addr, index, value);
-
-                cue_dmx(cue, index, value);
-                cue_sync(cue);
-            }
-
-            lua_pop(L, 1);
-        }
-        lua_pop(L, 3);
-
+        lua_pop(L, 2);
 
         //printf("%g\r", p);
         //fflush(stdout);
         usleep(25000);
-
     }
 
     lua_close(L);
