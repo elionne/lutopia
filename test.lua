@@ -12,12 +12,12 @@ for index, par in pairs(pars) do
 end
 --]]
 
-print('un1.test1', u.test1);
+print('u.test1', u.test1);
 u.test1.rgb.r = 0.1;
-print('un1.group1.test1', u.group1.test1);
+print('u.group1.test1', u.group1.test1);
 
-a = rgb.new(0.25, 0.5, 0.75);
-b = rgb.new(0.6, 0.1, 0.2);
+a = rgb.from_hsv({h=0.25, s=1, v=1});
+b = rgb.from_hsv({h=0.6, s=1, v=1});
 blanc = rgb.new(1, 1, 1);
 u.test1.rgb = blanc;
 
@@ -31,18 +31,17 @@ u.test1.rgb = blanc;
 --	d = light.gradiant(a, b, i/10);
 --	print(d:to_html());
 --end
---print(b:to_html())
 
 function main(p)
-    --u.test1.rgb:from_hsv{h=p, s=1, v=1};
+    --u.test1.rgb = rgb.from_hsv{h=p, s=1, v=1};
 
+--[[
     if math.random() * 10 < 2 then
-        u.test1.rgb:from_hsv{h=p, s=1, v=1};
+        u.test1.rgb = rgb.from_hsv{h=p, s=1, v=1};
     else
-        u.test1.rgb:from_hsv{h=0, s=0, v=0};
+        u.test1.rgb = rgb.from_hsv{h=0, s=0, v=0};
     end
-
-
-    --u.test1.rgb = light.gradiant(a, b, p, 0.3)
+--]]
+    u.test1.rgb = light.gradiant(a, b, p, 0.5)
     --print(u.test1.rgb);
 end
