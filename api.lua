@@ -26,10 +26,12 @@ function rgb:to_hsv()
 	return {h=h, s=s, v=v}
 end
 
-function rgb:from_hsv(new)
+function rgb.from_hsv(new, old)
 
-	local old = self:to_hsv();
 	local h, s, v = new.h, new.s, new.v;
+
+	if old == nil then old = rgb.new(1, 1, 1); end
+	old = old:to_hsv();
 
 	if new.h == nil then h = old.h end
 	if new.s == nil then s = old.s end
@@ -40,12 +42,12 @@ function rgb:from_hsv(new)
 	local m = v*(1 - f*s);
 	local n = v*(1 - (1 - f)*s);
 
-	if ti == 0 or ti == 6 then return self:set(v, n, l) end
-	if ti == 1 then return self:set(m, v, l) end
-	if ti == 2 then return self:set(l, v, n) end
-	if ti == 3 then return self:set(l, m, v) end
-	if ti == 4 then return self:set(n, l, v) end
-	if ti == 5 then return self:set(v, l, m) end
+	if ti == 0 or ti == 6 then return rgb.new(v, n, l) end
+	if ti == 1 then return rgb.new(m, v, l) end
+	if ti == 2 then return rgb.new(l, v, n) end
+	if ti == 3 then return rgb.new(l, m, v) end
+	if ti == 4 then return rgb.new(n, l, v) end
+	if ti == 5 then return rgb.new(v, l, m) end
 
 end
 
