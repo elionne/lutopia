@@ -1,3 +1,25 @@
+-- This function copies deeply a table with recursive methode,
+-- it's extracted from http://lua-users.org/wiki/CopyTable
+
+function clone(object)
+    local lookup_table = {}
+    local function _copy(object)
+        if type(object) ~= "table" then
+            return object
+        elseif lookup_table[object] then
+            return lookup_table[object]
+        end
+        local new_table = {}
+        lookup_table[object] = new_table
+        for index, value in pairs(object) do
+            new_table[_copy(index)] = _copy(value)
+        end
+        return setmetatable(new_table, getmetatable(object))
+    end
+    return _copy(object)
+end
+
+
 rgb={r=0, g=0, b=0}
 rgb_mt={__index=rgb}
 
@@ -86,40 +108,73 @@ function light.gradiant(left, right, pos, cross)
 
 end
 
-light.parled = {addr=0, rgb=rgb.new()}
-light.parled_mt = {__index=light.parled}
+function new_light(class, priv)
+    local setter = function(self, key, value)
+        if( type(value) == "function" ) then
+            rawset(new_type, key, value);
+            return;
+        end
+        --last = clone(priv);
+        priv[key] = value;
+        getmetatable(self).changed = true;
+    end
 
-function light.parled:value()
+    class.ack = function(self)
+        getmetatable(self).changed = false;
+    end
+
+    class.is_changed = function(self)
+        return getmetatable(self).changed;
+    end
+
+    setmetatable(priv, {__index = class} );
+    local new_light_mt = {
+        __index = priv,
+        __newindex = setter,
+        __tostring = class.tostring,
+        priv = priv,
+        --last = clone(priv),
+        changed = false
+    }
+
+    return setmetatable({}, new_light_mt);
+end
+
+parled = {};
+
+function parled:value()
     return math.max(self.rgb.r, self.rgb.g, self.rgb.b)
 end
 
-function light.parled:set_value(v)
+function parled:set_value(v)
     self.rgb = self.rgb:from_hsv({v=v})
 end
 
-function light.parled:dmx()
+function parled:dmx()
     return {addr=self.addr,
             -- Start at 0
             [1] = self.rgb.r, [2] = self.rgb.g, [3] = self.rgb.b};
 end
 
-function light.parled:tostring()
+function parled:tostring()
     return self.rgb:tostring();
 end
 
-light.parled_mt.__tostring = light.parled.tostring;
+function parled.new(addr, color)
+    local data = {addr = addr, rgb = color or rgb.new()};
+    return new_light(parled, data);
+end
 
-function light.parled.new(addr, rgb)
-    local n = {addr=addr, rgb=rgb};
-    setmetatable(n, light.parled_mt);
+--[[
+spot = create_type_light();
+
+function spot.new(addr)
+    local n = {addr=addr, value=0}
+    setmetatable(n, { __index = spot });
     return n;
 end
 
-light.spot = {addr=0, value=0}
-
-
-function light.spot:dmx()
+function spot:dmx()
     return {addr=self.addr, [0] = value};
 end
-
-
+]]--

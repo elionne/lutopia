@@ -44,14 +44,7 @@ void new_light(lua_State *L, unsigned int addr, const char *universe,
 {
     int err;
 
-    lua_getglobal(L, LIGHT);
-    if( !lua_istable(L, -1) ){
-        printf("Internal error: global \"%s\"table is not defined\n", LIGHT);
-        lua_pop(L, 1);
-        goto error;
-    }
-
-    lua_getfield(L, -1, type);
+    lua_getglobal(L, type);
     if( !lua_istable(L, -1) ){
         printf("\"%s\" type, is not defined\n", type);
         lua_pop(L, 2);
@@ -82,8 +75,8 @@ void new_light(lua_State *L, unsigned int addr, const char *universe,
 
     lua_setfield(L, -2, name);
 
-    /* pops 'type', 'light' and 'universe' from stack */
-    lua_pop(L, 3);
+    /* pops 'light' and 'universe' from stack */
+    lua_pop(L, 2);
 
 error:
     return;
@@ -206,6 +199,58 @@ int send_dmx(lua_State *L, libusb_device_handle* cue)
     return 1;
 }
 
+/* This function
+ * TODO comment it!
+ */
+int update_lights(lua_State *L, const char *universe, libusb_device_handle* cue)
+{
+    int err;
+
+    lua_getglobal(L, universe);
+    if( !lua_istable(L, -1) ){
+        printf("%s not found\n", universe);
+        return 0;
+    }
+
+    lua_pushnil(L);
+    while( lua_next(L, -2) ){
+        if( lua_istable(L, -1) ){
+
+            lua_getfield(L, -1, "is_changed");
+            if( lua_isnil(L, -1) ){
+                lua_pop(L, 2);
+                continue;
+            }
+
+            /* push self first argument */
+            lua_pushvalue(L, -2);
+
+            err = lua_pcall(L, 1, 1, 0);
+            dbg_lua(L, err, "is_changed");
+
+            /*
+            printf("light : %s, changed %i\n", lua_tostring(L, 2),
+                                               lua_tointeger(L, -1));
+            */
+            if( lua_toboolean(L, -1) ){
+                /* pops the result of 'is_changed' */
+                lua_pop(L, 1);
+
+                /* send dmx data */
+                send_dmx(L, cue);
+
+                /* pops light */
+                lua_pop(L, 1);
+            }else
+                lua_pop(L, 2);
+
+        }
+    }
+    lua_pop(L, 1);
+
+    return 0;
+}
+
 int main()
 {
     libusb_device_handle* cue = cue_open();
@@ -247,21 +292,7 @@ int main()
         err = lua_pcall(L, 1, 0, 0);
         dbg_lua(L, err, "main");
 
-        lua_getglobal(L, "u");
-        if( !lua_istable(L, -1) ){
-            printf("u not found\n");
-            break;
-        }
-
-        lua_getfield(L, -1, "test1");
-        if( !lua_istable(L, -1) ){
-            printf("%s light not found\n", "test1");
-            break;
-        }
-
-        send_dmx(L, cue);
-
-        lua_pop(L, 2);
+        update_lights(L, "u", cue);
 
         //printf("%g\r", p);
         //fflush(stdout);
