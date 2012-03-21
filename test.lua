@@ -19,7 +19,9 @@ print('u.group1.test1', u.group1.test1);
 a = rgb.from_hsv({h=0.25, s=1, v=1});
 b = rgb.from_hsv({h=0.6, s=1, v=1});
 blanc = rgb.new(1, 1, 1);
-u.test1.rgb = blanc;
+off = rgb.new(0, 0, 0);
+
+u.test1.rgb = off;
 
 --for k,v in pairs(u.test1) do print(k, v) end
 
@@ -33,7 +35,7 @@ u.test1.rgb = blanc;
 --end
 
 function main(p)
-    --u.test1.rgb = rgb.from_hsv{h=p, s=1, v=1};
+    u.test1.rgb = rgb.from_hsv{h=p, s=1, v=1};
 
 --[[
     if math.random() * 10 < 2 then
@@ -42,6 +44,6 @@ function main(p)
         u.test1.rgb = rgb.from_hsv{h=0, s=0, v=0};
     end
 --]]
-    u.test1.rgb = light.gradiant(a, b, p, 0.5)
+    --u.test1.rgb = light.gradiant(a, b, p, 0.5)
     --print(u.test1.rgb);
 end
