@@ -19,7 +19,6 @@ function clone(object)
     return _copy(object)
 end
 
-
 rgb={r=0, g=0, b=0}
 rgb_mt={__index=rgb}
 
@@ -108,7 +107,13 @@ function light.gradiant(left, right, pos, cross)
 
 end
 
+-- This function must called when you create a new light,
+-- its contained the mecanisme to store if data have changed
+-- since the last read
+
+-- The table pirv will be added to class table like private data
 function new_light(class, priv)
+    -- setter will be called every time you write somethings in priv
     local setter = function(self, key, value)
         if( type(value) == "function" ) then
             rawset(new_type, key, value);
@@ -140,6 +145,7 @@ function new_light(class, priv)
     return setmetatable({}, new_light_mt);
 end
 
+-- first implemented light type
 parled = {};
 
 function parled:value()

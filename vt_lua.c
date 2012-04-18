@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 
 /* lua includes */
 #include <lua.h>
@@ -134,10 +135,10 @@ error:
     return;
 }
 
-void new_global_light(lua_State *L)
+void new_global_table(lua_State *L, const char *table)
 {
     lua_newtable(L);
-    lua_setglobal(L, LIGHT);
+    lua_setglobal(L, table);
 }
 
 void new_universe(lua_State *L, const char *universe)
@@ -251,6 +252,30 @@ int update_lights(lua_State *L, const char *universe, libusb_device_handle* cue)
     return 0;
 }
 
+int lt_sleep(lua_State *L)
+{
+    struct timespec how_long;
+
+    float u_sec = lua_tonumber(L, -1);
+    lua_pop(L, 1);
+
+    if( u_sec > 1e6 ){
+        how_long.tv_sec = (time_t)(u_sec / 1e6);
+        how_long.tv_nsec = (long)(u_sec * 1e3 - how_long.tv_sec * 1e9);
+    }else{
+        how_long.tv_sec = 0;
+        how_long.tv_nsec = u_sec * 1e3;
+    }
+
+    nanosleep(&how_long, 0);
+    return 0;
+}
+
+void register_lt_functions(lua_State *L)
+{
+    lua_register(L, "usleep", lt_sleep);
+}
+
 int main()
 {
     libusb_device_handle* cue = cue_open();
@@ -260,10 +285,12 @@ int main()
 
     luaL_openlibs(L);
 
-    new_global_light(L);
+    new_global_table(L, LIGHT);
+
+    register_lt_functions(L);
+
     new_universe(L, "u");
     new_group(L, "u", "group1");
-
 
     err = luaL_loadfile(L, "api.lua");
     dbg_lua(L, err, "api.lua");
