@@ -187,28 +187,29 @@ libusb_device_handle* cue_open()
     device_count = libusb_get_device_list(0, &all_usb);
 
     for(device_index = 0; device_index < device_count; device_index++){
-        libusb_device_handle *h;
+        struct libusb_device_descriptor desc;
         int err;
         int bus_number = libusb_get_bus_number(all_usb[device_index]);
         int device_addr= libusb_get_device_address(all_usb[device_index]);
 
 
-        err = libusb_open(all_usb[device_index], &h);
-        if( err ){
-            //printf("error occurs when attempting to open usb device %i,%i\n",
-            //       bus_number, device_addr);
-            continue;
-        }
+        /* CueCable vendor_id and product_id */
+        libusb_get_device_descriptor(all_usb[device_index], &desc);
+        if( desc.idVendor == 0x0547 && desc.idProduct == 0x1026 ){
+            libusb_device_handle *h;
+            err = libusb_open(all_usb[device_index], &h);
+            if( err ){
+                printf("error occurs when attempting to open usb device %i,%i\n",
+                       bus_number, device_addr);
+                break;
+            }
 
-        if( test_vip_pid(h, 0x0547, 0x1026) ){
             cue = h;
             printf("device found %i,%i\n", bus_number, device_addr);
             break;
         }
-
-        libusb_close(h);
-
     }
+
     libusb_free_device_list(all_usb, 0);
     if( cue == 0 )
         return 0;
@@ -224,6 +225,7 @@ libusb_device_handle* cue_open()
     cue_sync(cue);
 
     return cue;
+
 }
 
 void cue_close(libusb_device_handle *cue)
