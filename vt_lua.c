@@ -12,6 +12,8 @@
 
 #define LIGHT "light"
 
+static libusb_device_handle* cue;
+
 void dbg_lua(lua_State *L, int err, const char *msg)
 {
     if( err ){
@@ -249,7 +251,15 @@ int update_lights(lua_State *L, const char *universe, libusb_device_handle* cue)
     }
     lua_pop(L, 1);
 
-    return 0;
+    return 1;
+}
+
+int lt_update_lights(lua_State *L)
+{
+    const char *universe = lua_tostring(L, -1);
+    lua_pop(L, 1);
+   
+    update_lights(L, universe, cue);
 }
 
 int lt_sleep(lua_State *L)
@@ -268,22 +278,23 @@ int lt_sleep(lua_State *L)
     }
 
     nanosleep(&how_long, 0);
+    //printf("nanosleep %.03fs\n", u_sec / 1e6);
     return 0;
 }
 
 void register_lt_functions(lua_State *L)
 {
     lua_register(L, "usleep", lt_sleep);
+    lua_register(L, "update_lights", lt_update_lights);
 }
 
 int main()
 {
-    libusb_device_handle* cue = cue_open();
     lua_State *L = luaL_newstate();
-
     int err;
 
     luaL_openlibs(L);
+    cue = cue_open();
 
     new_global_table(L, LIGHT);
 
@@ -292,10 +303,10 @@ int main()
     new_universe(L, "u");
     new_group(L, "u", "group1");
 
-    err = luaL_loadfile(L, "api.lua");
-    dbg_lua(L, err, "api.lua");
+    err = luaL_loadfile(L, "lights.lua");
+    dbg_lua(L, err, "lights.lua");
     err = lua_pcall(L, 0, LUA_MULTRET, 0);
-    dbg_lua(L, err, "api.lua");
+    dbg_lua(L, err, "lights.lua");
 
     new_light(L, 1, "u", "parled", "test1");
     link_into_group(L, "u", "group1", "test1");
