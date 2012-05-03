@@ -1,0 +1,1 @@
+SUBSYSTEM=="usb" , ATTR{idVendor}=="0547", ATTR{idProduct}=="1026", GROUP="wheel"
