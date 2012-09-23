@@ -192,8 +192,8 @@ int send_dmx(lua_State *L, libusb_device_handle* cue)
             //printf("addr %i, key : %i, value : %hhu\n", start_addr, index, value);
 
             cue_dmx(cue, start_addr + index, value);
-            cue_sync(cue);
         }
+        cue_sync(cue);
         lua_pop(L, 1);
     }
 
@@ -235,6 +235,7 @@ int update_lights(lua_State *L, const char *universe, libusb_device_handle* cue)
             printf("light : %s, changed %i\n", lua_tostring(L, 2),
                                                lua_tointeger(L, -1));
             */
+            
             if( lua_toboolean(L, -1) ){
                 /* pops the result of 'is_changed' */
                 lua_pop(L, 1);
@@ -309,7 +310,10 @@ int main()
     dbg_lua(L, err, "lights.lua");
 
     new_light(L, 1, "u", "parled", "test1");
+    new_light(L, 6, "u", "parled", "test2");
+    
     link_into_group(L, "u", "group1", "test1");
+    link_into_group(L, "u", "group1", "test2");
 
     err = luaL_loadfile(L, "test.lua");
     dbg_lua(L, err, "test.lua");
@@ -318,7 +322,8 @@ int main()
 
     double p = 0;
 
-    for(p = 0; p <= 1 ; p += 0.002 ){
+    //for(p = 0; p <= 1 ; p += 0.002 )
+    do{
         int err;
 
         lua_getglobal(L, "main");
@@ -335,7 +340,7 @@ int main()
         //printf("%g\r", p);
         //fflush(stdout);
         usleep(25000);
-    }
+    }while(0);
 
     lua_close(L);
     cue_close(cue);

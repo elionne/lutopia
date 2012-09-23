@@ -192,7 +192,6 @@ libusb_device_handle* cue_open()
         int bus_number = libusb_get_bus_number(all_usb[device_index]);
         int device_addr= libusb_get_device_address(all_usb[device_index]);
 
-
         /* CueCable vendor_id and product_id */
         libusb_get_device_descriptor(all_usb[device_index], &desc);
         if( desc.idVendor == 0x0547 && desc.idProduct == 0x1026 ){
@@ -225,7 +224,6 @@ libusb_device_handle* cue_open()
     cue_sync(cue);
 
     return cue;
-
 }
 
 void cue_close(libusb_device_handle *cue)
