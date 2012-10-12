@@ -1,11 +1,8 @@
-#ifndef CUECABLE_H
-#define CUECABLE_H
+#ifndef _CUECABLE_H_
+#define _CUECABLE_H_
 
-#include <libusb-1.0/libusb.h>
+#include "dmx_server.h"
 
-int cue_sync(libusb_device_handle *h);
-int cue_dmx(libusb_device_handle *h, uint16_t addr, unsigned char value);
-libusb_device_handle* cue_open();
-void cue_close(libusb_device_handle *cue);
-
+void cue_new(struct dmx_controler *dmx);
+    
 #endif
