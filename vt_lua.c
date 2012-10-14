@@ -3,16 +3,20 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include <errno.h>
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 /* lua includes */
 #include <lua.h>
 #include <lauxlib.h>
 
-#include "cuecable.h"
-
 #define LIGHT "light"
 
-static libusb_device_handle* cue;
+int dmx;
+unsigned char dmx_data[513] = {0};
 
 void dbg_lua(lua_State *L, int err, const char *msg)
 {
@@ -153,7 +157,7 @@ void new_universe(lua_State *L, const char *universe)
 /* Light in use must be on the top of stack. when this function returns, current
  * light still on stack.
  */
-int send_dmx(lua_State *L, libusb_device_handle* cue)
+int send_dmx(lua_State *L, char *data)
 {
     int err;
     short start_addr;
@@ -191,9 +195,8 @@ int send_dmx(lua_State *L, libusb_device_handle* cue)
 
             //printf("addr %i, key : %i, value : %hhu\n", start_addr, index, value);
 
-            cue_dmx(cue, start_addr + index, value);
+            data[start_addr + index] =  value;
         }
-        cue_sync(cue);
         lua_pop(L, 1);
     }
 
@@ -205,7 +208,7 @@ int send_dmx(lua_State *L, libusb_device_handle* cue)
 /* This function
  * TODO comment it!
  */
-int update_lights(lua_State *L, const char *universe, libusb_device_handle* cue)
+int update_lights(lua_State *L, const char *universe, int dmx)
 {
     int err;
 
@@ -235,13 +238,13 @@ int update_lights(lua_State *L, const char *universe, libusb_device_handle* cue)
             printf("light : %s, changed %i\n", lua_tostring(L, 2),
                                                lua_tointeger(L, -1));
             */
-            
+
             if( lua_toboolean(L, -1) ){
                 /* pops the result of 'is_changed' */
                 lua_pop(L, 1);
 
                 /* send dmx data */
-                send_dmx(L, cue);
+                send_dmx(L, dmx_data);
 
                 /* pops light */
                 lua_pop(L, 1);
@@ -252,6 +255,13 @@ int update_lights(lua_State *L, const char *universe, libusb_device_handle* cue)
     }
     lua_pop(L, 1);
 
+    int len = send(dmx, dmx_data, 513, 0);
+    if( len != 513 ){
+        printf("socket error, too few data send, %i\n", len);
+        puts(strerror(errno));
+        return 0;
+    }
+
     return 1;
 }
 
@@ -260,7 +270,7 @@ int lt_update_lights(lua_State *L)
     const char *universe = lua_tostring(L, -1);
     lua_pop(L, 1);
    
-    update_lights(L, universe, cue);
+    update_lights(L, universe, dmx);
 }
 
 int lt_sleep(lua_State *L)
@@ -293,11 +303,27 @@ int main()
 {
     lua_State *L = luaL_newstate();
     int err;
+    
+    struct sockaddr_in send_to;
 
     luaL_openlibs(L);
-    cue = cue_open();
+    
+    dmx = socket(AF_INET, SOCK_DGRAM, 0);
 
-    new_global_table(L, LIGHT);
+    send_to.sin_port = htons(21812);
+    send_to.sin_family = AF_INET;
+
+    if( inet_aton("127.0.0.1", &send_to.sin_addr) == 0 ){
+        printf("invalid address\n");
+        return EXIT_FAILURE;
+    }
+
+    if( connect(dmx, (struct sockaddr*)&send_to, sizeof(struct sockaddr_in)) < 0){
+        printf("couldn’t not connect socket\n");
+        return EXIT_FAILURE;
+    }
+  
+    /*new_global_table(L, LIGHT); */
 
     register_lt_functions(L);
 
@@ -335,7 +361,7 @@ int main()
         err = lua_pcall(L, 1, 0, 0);
         dbg_lua(L, err, "main");
 
-        update_lights(L, "u", cue);
+        //update_lights(L, "u", cue);
 
         //printf("%g\r", p);
         //fflush(stdout);
@@ -343,6 +369,6 @@ int main()
     }while(0);
 
     lua_close(L);
-    cue_close(cue);
+    close(dmx);
     return 0;
 }

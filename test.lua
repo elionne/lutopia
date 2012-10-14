@@ -62,15 +62,15 @@ function main(p)
     end
 
     local flash = function(p)
-        if math.random() > 0.5 then
-            u.test1.hsv.v = 0.01
+        if math.random() > 0.95 then
+            u.test1.hsv.v = 0.5
         else
             u.test1.hsv.v = 0
         end
         u.test1.rgb = rgb.from_hsv(u.test1.hsv)
         
-        if math.random() > 0.5 then
-            u.test2.hsv.v = 0.01
+        if math.random() > 0.95 then
+            u.test2.hsv.v = 0.5
         else
             u.test2.hsv.v = 0
         end
