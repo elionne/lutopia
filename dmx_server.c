@@ -71,18 +71,26 @@ int main(int argc, char* argv[])
 
     dmx_open(&open_dmx);
     do{
+ 
+/* send data at full speed rate or wait until data incoming to send to dmx */
 #if 1
-        struct pollfd fds;
-        fds.fd = s;
-        fds.events = POLLIN;
-        if( poll(&fds, 1, 0) > 0 )
+        struct pollfd flush;
+        flush.fd = s;
+        flush.events = POLLIN;
+        if( poll(&flush, 1, 0) > 0 )
 #endif
         {
-            len = recv(s, dmx_data, sizeof(dmx_data), 0);
+            int count = 0;
+            /* flush the buffer, returns only the last packet sent */
+            do{
+                len = recv(s, dmx_data, sizeof(dmx_data), 0);
+                count++;
+            }while( poll(&flush, 1, 0) );
             
             if( len < sizeof(dmx_data) )
                 printf("corrupted data receive\n");
-            printf("received %i bytes\n", len);
+            if( count > 1 )
+                printf("multiple data received %i\n", count);
         }
         dmx_data[0] = 0;
 
