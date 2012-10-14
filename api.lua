@@ -46,7 +46,7 @@ function table_print (tt, indent, done)
   end
 end
 
--- This function must called when you create a new light,
+-- This function must be called when you create a new light,
 -- its contained the mecanisme to store if data have changed
 -- since the last read
 
