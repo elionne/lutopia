@@ -6,22 +6,12 @@
 
 #include <libusb-1.0/libusb.h>
 
-#include "dmx_server.h"
-
 static int cue_init(libusb_device_handle *h);
 int cue_sync(libusb_device_handle *h);
 int cue_dmx(libusb_device_handle *h, uint16_t addr, unsigned char value);
 int cue_send_all(libusb_device_handle *h, unsigned char *data);
 int cue_open(libusb_device_handle* h);
 int cue_close(libusb_device_handle *cue);
-
-void cue_new(struct dmx_controler *dmx){
-    dmx->init      = (dmx_function)cue_open;
-    dmx->open_dmx  = (dmx_function)cue_init;
-    dmx->send_dmx  = (dmx_send_function)cue_send_all;
-    dmx->close_dmx = (dmx_function)cue_close;
-}
-
 
 #if 0
 static int test_vip_pid(libusb_device_handle *h, uint16_t vendor_id,
