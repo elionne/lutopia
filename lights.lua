@@ -34,7 +34,7 @@ end
 function parled:dmx()
     return {addr=self.addr,
             -- Start at 0 (index 0 and 4 are unsed)
-            [1] = self.rgb.r, [2] = self.rgb.g, [3] = self.rgb.b};
+            [1] = self.rgb.r*255, [2] = self.rgb.g*255, [3] = self.rgb.b*255};
 end
 
 function parled:tostring()

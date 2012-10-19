@@ -191,9 +191,10 @@ int send_dmx(lua_State *L, char *data)
     while( lua_next(L, -2) ){
         if( lua_isnumber(L, -2) ){
             short index = lua_tointeger(L, -2);
-            char  value = (char)(lua_tonumber(L, -1) * 255);
+            double d = lua_tonumber(L, -1) /** 255*/;
+            char  value = (char)(d);
 
-            //printf("addr %i, key : %i, value : %hhu\n", start_addr, index, value);
+            //printf("addr %i, key : %i, value : %hhu, d : %f\n", start_addr, index, value, d);
 
             data[start_addr + index] =  value;
         }
