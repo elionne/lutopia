@@ -85,5 +85,6 @@ function new_light(class, priv)
 end
 
 -- This task refresh the dmx line (little more than 50hz)
-add_task(function() update_lights("u") end, 0.9, 0.02)
+add_task(function() update_lights("u") end, 1, 0.02)
+
 

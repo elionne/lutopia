@@ -89,8 +89,10 @@ int main(int argc, char* argv[])
             
             if( len < sizeof(dmx_data) )
                 printf("corrupted data receive\n");
+#if 0
             if( count > 1 )
                 printf("multiple data received %i\n", count);
+#endif
         }
         dmx_data[0] = 0;
 
