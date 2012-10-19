@@ -349,25 +349,31 @@ int main()
 
     double p = 0;
 
-    //for(p = 0; p <= 1 ; p += 0.002 )
-    do{
-        int err;
+    lua_getglobal(L, "main");
+    if( !lua_isfunction(L, -1) ){
+        printf("\"main\" function, is not defined\n");
+        return -1;
+    }
+    lua_pushnumber(L, p);
+    err = lua_pcall(L, 1, 0, 0);
+    dbg_lua(L, err, "main");
 
-        lua_getglobal(L, "main");
+    //update_lights(L, "u", cue);
+
+    //printf("%g\r", p);
+    //fflush(stdout);
+    
+    do{
+        lua_getglobal(L, "rt_time");
         if( !lua_isfunction(L, -1) ){
-            printf("\"main\" function, is not defined\n");
+            printf("\"rt_time\" function, is not defined\n");
             break;
         }
-        lua_pushnumber(L, p);
-        err = lua_pcall(L, 1, 0, 0);
-        dbg_lua(L, err, "main");
 
-        //update_lights(L, "u", cue);
+        err = lua_pcall(L, 0, 0, 0);
+        dbg_lua(L, err, "rt_time");
 
-        //printf("%g\r", p);
-        //fflush(stdout);
-        usleep(25000);
-    }while(0);
+    }while(1);
 
     lua_close(L);
     close(dmx);

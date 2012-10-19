@@ -47,7 +47,7 @@ function main(p)
     local spectre = function(p)
         u.test1.hsv.h = p
         nop, u.test2.hsv.h = math.modf(p + 0.1);
-        
+                
         u.test1.rgb = rgb.from_hsv(u.test1.hsv)
         u.test2.rgb = rgb.from_hsv(u.test2.hsv)
     end
@@ -56,7 +56,7 @@ function main(p)
         u.test1.hsv.v = linearize(triangle(p, 0.00, 0.7, 0.1))
         u.test1.rgb = rgb.from_hsv(u.test1.hsv)
 
-        nop, p2 = math.modf(p + 0.5)
+        nop, p2 = math.modf(p + 0.25)
         u.test2.hsv.v = linearize(triangle(p2, 0.00, 0.7, 0.1))
         u.test2.rgb = rgb.from_hsv(u.test2.hsv)
     end
@@ -80,8 +80,11 @@ function main(p)
     local rgb_test = function(p)
         u.test1.rgb.b = triangle(p);
     end
+
+    u.test1.hsv = {h=1, s=0.75, v=1};
+    u.test2.hsv = {h=0.2, s=1, v=1};
     
-    add_task(spectre, 0.01, 2, "spectre")
+    --add_task(spectre, 0.001, 5, "spectre")
     --add_task(wave, 0.01, 0.5, "wave")
     add_task(flash, 1, 0.05, "flash")
     --add_task(rgb_test, 0.01, 10, "test")

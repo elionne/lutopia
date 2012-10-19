@@ -94,10 +94,7 @@ end
 
 
 function rt_time()
-    local n = 100
-    --while n >= 0 do
-    --  n = n - 1
-    while true do
+--    while true do
         sort_by_time(tasks)
 
         current = tasks.next.v
@@ -110,7 +107,7 @@ function rt_time()
         if current.p > 1 then current.p = 0 end
 
         decrease_time(sleep_time)
-    end
+--    end
 
 end
 
