@@ -46,6 +46,63 @@ function table_print (tt, indent, done)
   end
 end
 
+function export_to_lua(tt, name, done)
+    done = done or {}
+    name = name or ""
+
+    io.write(string.format("%s={\n", name))
+    function print_has_table(tt, name, done)
+        local comma, newline, space
+        if type(tt) == "table" then
+            for key, value in pairs(tt) do
+                --print(comma, space, newline)
+                if comma then
+                    io.write(",")
+                    comma = false
+                end
+                if space then
+                    io.write(" ")
+                    space = false
+                end
+                if newline then
+                    io.write("\n")
+                    newline = false
+                end
+
+                if type(value) == "table" then
+                    if done[value] == nil then
+                        done[value] = true
+                        if getmetatable(value) == nil then
+                            -- no metatable
+                            io.write(string.format("%8s = {", key))
+                            print_has_table(value, name, done)
+                            io.write("}")
+                            newline, comma = true, true
+
+                        elseif getmetatable(value)["__tostring"] == nil then
+                            -- no __tostring function
+                            print_has_table(value, name, done)
+                        else
+                            -- call __tostring function
+                            io.write(string.format("%8s = {%s}",
+                                    tostring(key), tostring(value)));
+                            newline, comma = true, true
+                        end
+                    else -- if table is already set
+                        io.write(string.format("%s=%s.%s", key, name, key))
+                        comma, space = true, true
+                    end
+                end
+            end
+        else
+            io.write(tt .. "\n")
+        end
+    end
+    print_has_table(tt, name, done)
+    io.write("\n};\n")
+
+end
+
 -- This function must be called when you create a new light,
 -- its contained the mecanisme to store if data have changed
 -- since the last read

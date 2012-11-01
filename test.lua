@@ -76,16 +76,17 @@ function main(p)
     end
 
     local rgb_test = function(p)
-        u.test1.rgb.b = triangle(p);
+        export_to_lua(u, "u")
     end
 
-    u.test1.hsv = {h=1, s=0.75, v=1};
+    u.test1.hsv = {h=1, s=1, v=1};
     u.test2.hsv = {h=0.2, s=1, v=1};
     
-    --add_task(spectre, 0.001, 5, "spectre")
+    add_task(spectre, 0.002, 10, "spectre")
     --add_task(wave, 0.01, 0.5, "wave")
-    add_task(flash, 1, 0.05, "flash")
-    --add_task(rgb_test, 0.01, 10, "test")
+    --add_task(flash, 1, 0.05, "flash")
+    add_task(rgb_test, 1, 1, "test")
+
 
     start_task()
 
