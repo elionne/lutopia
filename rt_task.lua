@@ -25,7 +25,7 @@ function swap_task(a, b)
 end
 
 function advance_train(c)
-    if c ~= task then
+   if c ~= task then
         if c.next.locked ~= true then
             swap_task(c, c.next)
             --print(c.v.time, c.next.v.time)
@@ -41,6 +41,7 @@ function advance_train(c)
             end
         end
     end
+
 end
 
 function finnish(c)
@@ -88,26 +89,22 @@ function decrease_time(diff)
         current.locked = false
         current = current.next
     until current == tasks
-
-    return todo
 end
 
 
 function rt_time()
---    while true do
-        sort_by_time(tasks)
+    sort_by_time(tasks)
 
-        current = tasks.next.v
-        local sleep_time = math.min(current.time, current.total_time * current.step)
-        usleep(sleep_time*1e6)
+    current = tasks.next.v
+    local sleep_time = math.min(current.time, current.total_time * current.step)
+    usleep(sleep_time*1e6)
 
-        current.func(current.p)
-        --print_tasks()
-        current.p = current.p + current.step
-        if current.p > 1 then current.p = 0 end
+    current.func(current.p)
+    --print_tasks()
+    current.p = current.p + current.step
+    if current.p > 1 then current.p = 0 end
 
-        decrease_time(sleep_time)
---    end
+    decrease_time(sleep_time)
 
 end
 

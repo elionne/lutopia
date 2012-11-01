@@ -17,7 +17,7 @@ require "color"
 -- Every time you want to create a new instance of a light, you have to call
 -- this function. This reference the new intance internaly, its will be
 -- automaticly refresh by by the kernel:. When you create a new light type, you
--- have to follow exactly the same pattern descibe by parled.new
+-- have to follow exactly the same pattern describe by parled.new
 
 
 -- first implemented light type

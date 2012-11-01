@@ -21,16 +21,14 @@ b = rgb.from_hsv({h=0.6, s=1, v=1});
 blanc = rgb.new(1, 1, 1);
 off = rgb.new(0, 0, 0);
 
-u.test1.hsv = {h=1, s=1, v=1};
-u.test1.rgb = rgb.from_hsv(u.test1.hsv)
 --u.test1.rgb = off
 print('u.test1', u.test1);
 
-u.test2.rgb = rgb.new(255, 105, 180)
+u.test2.rgb = rgb.new(255/255, 105/255, 180/255)
 u.test2.hsv = u.test2.rgb:to_hsv()
 
-u.test1.rgb = rgb.new(255, 105, 180)
-u.test1.hsv = u.test2.rgb:to_hsv()
+u.test1.rgb = rgb.new(1, 1, 1)
+u.test1.hsv = u.test1.rgb:to_hsv()
 
 --for k,v in pairs(u.test1) do print(k, v) end
 
