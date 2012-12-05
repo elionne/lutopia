@@ -31,6 +31,14 @@ function parled:set_value(v)
     self.rgb = self.rgb:from_hsv({v=v})
 end
 
+function parled:set(rgb)
+    self.rgb:set(rgb)
+end
+
+function parled:transition(rgb, cross, p)
+    gradiant(self, rgb, p, cross);
+end
+
 function parled:dmx()
     return {addr=self.addr,
             -- Start at 0 (index 0 and 4 are unsed)

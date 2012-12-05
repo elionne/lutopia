@@ -1,10 +1,10 @@
 rgb={r=0, g=0, b=0}
 rgb_mt={__index=rgb}
 
-function rgb:set(r, g, b)
-    self.r = r;
-    self.g = g;
-    self.b = b;
+function rgb:set(rgb)
+    self.r = rgb.r;
+    self.g = rgb.g;
+    self.b = rgb.b;
 
     return self;
 end

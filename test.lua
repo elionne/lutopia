@@ -1,3 +1,5 @@
+require "cue"
+
 --[[
 pars ={}
 for i=1, 10 do
@@ -44,7 +46,7 @@ u.test1.hsv = u.test1.rgb:to_hsv()
 function main(p)
     local spectre = function(p)
         u.test1.hsv.h = p
-        nop, u.test2.hsv.h = math.modf(p + 0.1);
+        nop, u.test2.hsv.h = math.modf(p + 0.05);
                 
         u.test1.rgb = rgb.from_hsv(u.test1.hsv)
         u.test2.rgb = rgb.from_hsv(u.test2.hsv)
@@ -76,29 +78,27 @@ function main(p)
     end
 
     local rgb_test = function(p)
-        export_to_lua(u, "u")
+        if p == 0 then
+            set_cue(cue.seq4)
+        elseif p < 1/3 then
+            set_cue(cue.seq1)
+        elseif p < 2/3 then
+            set_cue(cue.seq2)
+        elseif p < 1 then
+            set_cue(cue.seq3)
+        end
+        --export_to_lua(u, "u");
     end
 
     u.test1.hsv = {h=1, s=1, v=1};
     u.test2.hsv = {h=0.2, s=1, v=1};
     
-    add_task(spectre, 0.002, 10, "spectre")
+    --add_task(spectre, 0.002, 10, "spectre")
     --add_task(wave, 0.01, 0.5, "wave")
     --add_task(flash, 1, 0.05, "flash")
-    add_task(rgb_test, 1, 1, "test")
+    add_task(rgb_test, 0.33, 1, "test")
 
 
     start_task()
 
-    
-
---[[
-    if math.random() * 10 < 2 then
-        u.test1.rgb = rgb.from_hsv{h=p, s=1, v=1};
-    else
-        u.test1.rgb = rgb.from_hsv{h=0, s=0, v=0};
-    end
---]]
-    --u.test1.rgb = light.gradiant(a, b, p, 0.5)
-    --print(u.test1.rgb);
 end

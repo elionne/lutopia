@@ -51,7 +51,7 @@ function export_to_lua(tt, name, done)
     name = name or ""
 
     io.write(string.format("%s={\n", name))
-    function print_has_table(tt, name, done)
+    local function print_has_table(tt, name, done)
         local comma, newline, space
         if type(tt) == "table" then
             for key, value in pairs(tt) do
@@ -139,6 +139,26 @@ function new_light(class, priv)
     }
 
     return setmetatable({}, new_light_mt);
+end
+
+function set_cue(seq)
+    for universe, snap in pairs(seq) do
+        if universe == "param" then
+        else
+            for light, value in pairs(snap) do
+                _G[universe][light]:set(value);
+                print( universe, light, value);
+            end
+        end
+    end
+end
+
+function set_cue_transition(seq)
+    for universe, snap in pairs(seq) do
+        for light, value in pairs(snap) do
+            _G[universe][light]:transition(value, seq.param.cross);
+        end
+    end
 end
 
 -- This task refresh the dmx line (little more than 50hz)
