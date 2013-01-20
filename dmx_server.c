@@ -13,6 +13,11 @@
 #include "dmx_server.h"
 #include "opendmx.h"
 
+/* include include here all driver you wante */
+
+/* OpenDMX driver wrapper */
+#include "opendmx_dmx_server.c"
+
 int dmx_open(struct dmx_controler* dmx)
 {return dmx->dmx_open(dmx->dh);}
 
@@ -25,26 +30,9 @@ int dmx_send(struct dmx_controler *dmx, unsigned char *data)
 int dmx_close(struct dmx_controler *dmx)
 {return dmx->dmx_close(dmx->dh);}
 
-/* Instance for the Open DMX standard cable */
-void open_dmx_new(struct dmx_controler *controler){
-    controler->dmx_init  = (dmx_function)open_dmx_init;
-    controler->dmx_open  = (dmx_function)open_dmx_open;
-    controler->dmx_send  = (dmx_send_function)open_dmx_send;
-    controler->dmx_close = (dmx_function)open_dmx_close;
-
-    controler->dh = (struct ftdi_context*)malloc(sizeof(struct ftdi_context));
-}
-
-void open_dmx_delete(struct dmx_controler *dmx)
-{
-    free(dmx->dh);
-}
-
-
 int main(int argc, char* argv[])
 {
-    
-   
+
     int s = socket(AF_INET, SOCK_DGRAM, 0);
     if(s <= 0 ){
         printf("Error while opening socket, abort. %s\n", strerror(errno));
@@ -56,7 +44,7 @@ int main(int argc, char* argv[])
     in.sin_addr.s_addr = INADDR_ANY;
     in.sin_port = htons(21812);
     in.sin_family = AF_INET;
-    
+
     if( bind(s, (struct sockaddr*)&in, sizeof(in)) < 0 ){
         printf("Could not bind the socket. %s\n", strerror(errno));
         return EXIT_FAILURE;
@@ -65,13 +53,13 @@ int main(int argc, char* argv[])
     unsigned char dmx_data[513];
     int len = 0;
 
-    struct dmx_controler open_dmx;
-    open_dmx_new(&open_dmx);
-  
+    struct dmx_controler driver;
+    opendmx_new(&driver);
 
-    dmx_open(&open_dmx);
+
+    dmx_open(&driver);
     do{
- 
+
 /* send data at full speed rate or wait until data incoming to send to dmx */
 #if 1
         struct pollfd flush;
@@ -86,7 +74,7 @@ int main(int argc, char* argv[])
                 len = recv(s, dmx_data, sizeof(dmx_data), 0);
                 count++;
             }while( poll(&flush, 1, 0) );
-            
+
             if( len < sizeof(dmx_data) )
                 printf("corrupted data receive\n");
 #if 0
@@ -96,16 +84,16 @@ int main(int argc, char* argv[])
         }
         dmx_data[0] = 0;
 
-        len = dmx_send(&open_dmx, dmx_data);
+        len = dmx_send(&driver, dmx_data);
         if( len != 513)
             printf("send %i bytes to dmx\r", len);
 
-        
+
     }while( 1 );
 
-    dmx_close(&open_dmx);
+    dmx_close(&driver);
 
-    open_dmx_delete(&open_dmx);
+    opendmx_delete(&driver);
     close(s);
     return EXIT_SUCCESS;
 }

@@ -3,7 +3,7 @@
 
 #include "opendmx.h"
 
-int open_dmx_open(struct ftdi_context *ftdic)
+int opendmx_open(struct ftdi_context *ftdic)
 {
     int ret;
     if (ftdi_init(ftdic) < 0)
@@ -24,10 +24,10 @@ int open_dmx_open(struct ftdi_context *ftdic)
     return EXIT_SUCCESS;
 }
 
-int open_dmx_init(struct ftdi_context *ftdic)
+int opendmx_init(struct ftdi_context *ftdic)
 {return 0;}
 
-int open_dmx_send(struct ftdi_context *ftdic, unsigned char *data)
+int opendmx_send(struct ftdi_context *ftdic, unsigned char *data)
 {
     int ret = 0;
     //struct timeval start, end;
@@ -51,14 +51,14 @@ int open_dmx_send(struct ftdi_context *ftdic, unsigned char *data)
     //if( diff < 0 )
     //    printf("timeval\tstart\tend\n\ttv_sec %i\t%i\n\ttv_usec %i\t%i\n",
     //           start.tv_sec, end.tv_sec, start.tv_usec, end.tv_usec);
-        
+
     usleep(1204*2);
     //printf("send time %i\n", diff);
     //fflush(stdout);
     return ret;
 }
 
-int open_dmx_close(struct ftdi_context *ftdic)
+int opendmx_close(struct ftdi_context *ftdic)
 {
     int ret = ftdi_usb_close(ftdic);
     if( ret < 0 )
