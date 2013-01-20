@@ -7,7 +7,7 @@ add_executable(lutopia ${src} )
 target_link_libraries(lutopia lua )
 install(TARGETS lutopia DESTINATION ../)
 
-set(dmx_server_src dmx_server.c open_dmx.c)
+set(dmx_server_src dmx_server.c opendmx.c)
 add_executable(dmx_server ${dmx_server_src} )
 target_link_libraries(dmx_server ftdi)
 install(TARGETS dmx_server DESTINATION ../)

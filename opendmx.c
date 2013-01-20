@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-#include "open_dmx.h"
+#include "opendmx.h"
 
 int open_dmx_open(struct ftdi_context *ftdic)
 {

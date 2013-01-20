@@ -11,7 +11,7 @@
 #include <arpa/inet.h>
 
 #include "dmx_server.h"
-#include "open_dmx.h"
+#include "opendmx.h"
 
 int dmx_open(struct dmx_controler* dmx)
 {return dmx->dmx_open(dmx->dh);}
