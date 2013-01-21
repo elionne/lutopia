@@ -13,11 +13,14 @@
 #include "dmx_server.h"
 #include "opendmx.h"
 
-/* include include here all driver you wante */
+/* include here all driver you want */
 
 /* OpenDMX driver wrapper */
 #include "opendmx_dmx_server.c"
 
+/* end of driver inclusion */
+
+/* this functions provides an easy way to use dmx protocol */
 int dmx_open(struct dmx_controler* dmx)
 {return dmx->dmx_open(dmx->dh);}
 
@@ -55,7 +58,6 @@ int main(int argc, char* argv[])
 
     struct dmx_controler driver;
     opendmx_new(&driver);
-
 
     dmx_open(&driver);
     do{

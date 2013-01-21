@@ -270,7 +270,7 @@ int lt_update_lights(lua_State *L)
 {
     const char *universe = lua_tostring(L, -1);
     lua_pop(L, 1);
-   
+
     update_lights(L, universe, dmx);
 }
 
@@ -304,11 +304,11 @@ int main()
 {
     lua_State *L = luaL_newstate();
     int err;
-    
+
     struct sockaddr_in send_to;
 
     luaL_openlibs(L);
-    
+
     dmx = socket(AF_INET, SOCK_DGRAM, 0);
 
     send_to.sin_port = htons(21812);
@@ -323,7 +323,7 @@ int main()
         printf("couldn’t not connect socket\n");
         return EXIT_FAILURE;
     }
-  
+
     /*new_global_table(L, LIGHT); */
 
     register_lt_functions(L);
@@ -338,7 +338,7 @@ int main()
 
     new_light(L, 1, "u", "parled", "test1");
     new_light(L, 6, "u", "parled", "test2");
-    
+
     link_into_group(L, "u", "group1", "test1");
     link_into_group(L, "u", "group1", "test2");
 
@@ -362,7 +362,7 @@ int main()
 
     //printf("%g\r", p);
     //fflush(stdout);
-    
+
     do{
         lua_getglobal(L, "rt_time");
         if( !lua_isfunction(L, -1) ){

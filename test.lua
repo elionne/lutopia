@@ -47,7 +47,7 @@ function main(p)
     local spectre = function(p)
         u.test1.hsv.h = p
         nop, u.test2.hsv.h = math.modf(p + 0.05);
-                
+
         u.test1.rgb = rgb.from_hsv(u.test1.hsv)
         u.test2.rgb = rgb.from_hsv(u.test2.hsv)
     end
@@ -68,7 +68,7 @@ function main(p)
             u.test1.hsv.v = 0
         end
         u.test1.rgb = rgb.from_hsv(u.test1.hsv)
-        
+
         if math.random() > 0.95 then
             u.test2.hsv.v = 0.5
         else
@@ -92,7 +92,7 @@ function main(p)
 
     u.test1.hsv = {h=1, s=1, v=1};
     u.test2.hsv = {h=0.2, s=1, v=1};
-    
+
     --add_task(spectre, 0.002, 10, "spectre")
     --add_task(wave, 0.01, 0.5, "wave")
     --add_task(flash, 1, 0.05, "flash")
