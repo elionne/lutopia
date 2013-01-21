@@ -1,21 +1,18 @@
+CFLAGS = -g -Wall
+LUTOPIA_OBJS = vt_lua.o
+LUTOPIA_LIBS =  -llua #-lusb-1.0
+DMX_SERVER_OBJS = dmx_server.o opendmx.o
+DMX_SERVER_LIBS = -lftdi
+
 all: lutopia dmx_server
 
-lutopia: vt_lua.o
-	gcc -o lutopia vt_lua.o -llua #-lusb-1.0
+lutopia: $(LUTOPIA_OBJS)
+	$(CC) -o $@ $^ $(LUTOPIA_LIBS)
 
-vt_lua.o: vt_lua.c
-	gcc -g -Wall -c -o vt_lua.o vt_lua.c
-
-dmx_server: dmx_server.o opendmx.o
-	gcc -o dmx_server dmx_server.o opendmx.o -lftdi
-dmx_server.o:
-	gcc -g -Wall -c -o dmx_server.o dmx_server.c
-
-cuecable.o: cuecable.c cuecable.h
-	gcc -g -Wall -c -o cuecable.o cuecable.c
-opendmx.o: opendmx.c opendmx.h
-	gcc -g -Wall -c -o opendmx.o opendmx.c
+dmx_server: $(DMX_SERVER_OBJS)
+	$(CC) -o $@ $^ $(DMX_SERVER_LIBS)
 
 clean:
-	rm *.o
-	rm lutopia dmx_server
+	rm -f $(LUTOPIA_OBJS) $(DMX_SERVER_OBJS) lutopia dmx_server
+
+.PHONY: clean
