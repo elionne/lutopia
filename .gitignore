@@ -1,3 +1,4 @@
+.*
 *.o
-vt_lua
-build
+dmx_server
+lutopia
