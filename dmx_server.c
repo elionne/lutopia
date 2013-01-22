@@ -24,9 +24,6 @@
 int dmx_open(struct dmx_controler* dmx)
 {return dmx->dmx_open(dmx->dh);}
 
-int dmx_init(struct dmx_controler *dmx)
-{return dmx->dmx_init(dmx->dh);}
-
 int dmx_send(struct dmx_controler *dmx, unsigned char *data)
 {return dmx->dmx_send(dmx->dh, data);}
 
@@ -56,10 +53,7 @@ int main(int argc, char* argv[])
     unsigned char dmx_data[513];
     int len = 0;
 
-    struct dmx_controler driver;
-    opendmx_new(&driver);
-
-    dmx_open(&driver);
+    dmx_open(dmx_drv[0]);
     do{
 
 /* send data at full speed rate or wait until data incoming to send to dmx */
@@ -86,16 +80,15 @@ int main(int argc, char* argv[])
         }
         dmx_data[0] = 0;
 
-        len = dmx_send(&driver, dmx_data);
+        len = dmx_send(dmx_drv[0], dmx_data);
         if( len != 513)
             printf("send %i bytes to dmx\r", len);
 
 
     }while( 1 );
 
-    dmx_close(&driver);
+    dmx_close(dmx_drv[0]);
 
-    opendmx_delete(&driver);
     close(s);
     return EXIT_SUCCESS;
 }

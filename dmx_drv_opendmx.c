@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 
+#include "dmx_server.h"
 #include "opendmx.h"
 
 int opendmx_open(struct ftdi_context *ftdic)
@@ -71,6 +72,7 @@ int opendmx_close(struct ftdi_context *ftdic)
     return 0;
 }
 
+DMX_DRV_REGISTER(opendmx)
 
 #ifdef EXEMPLE
 int main(void)
