@@ -21,7 +21,7 @@ lutopia: $(LUTOPIA_OBJS)
 dmx_drv_list.h: $(DMX_DRV_DEF)
 	for e in $^; do ./$$e; done > $@
 
-dmx_drv.c: dmx_drv_list.h
+dmx_drv.o: dmx_drv.c dmx_drv_list.h
 
 dmx_server: $(DMX_SERVER_OBJS)
 	$(CC) -o $@ $^ $(DMX_SERVER_LIBS)
