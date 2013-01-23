@@ -28,7 +28,8 @@ extern const struct dmx_controler *dmx_drv[];
   #drv,\
   (dmx_function) drv ## _open,\
   (dmx_send_function) drv ## _send,\
-  (dmx_function) drv ## _close\
+  (dmx_function) drv ## _close,\
+  0\
 };
 #endif
 
