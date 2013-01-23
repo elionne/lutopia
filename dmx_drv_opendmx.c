@@ -25,9 +25,6 @@ int opendmx_open(struct ftdi_context *ftdic)
     return EXIT_SUCCESS;
 }
 
-int opendmx_init(struct ftdi_context *ftdic)
-{return 0;}
-
 int opendmx_send(struct ftdi_context *ftdic, unsigned char *data)
 {
     int ret = 0;
