@@ -1,28 +1,32 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-#include "dmx_server.h"
-#include "opendmx.h"
+#include <ftdi.h>
 
-int opendmx_open(struct ftdi_context *ftdic)
+#include "dmx_server.h"
+
+struct ftdi_context* opendmx_open(unsigned char* name)
 {
+    struct ftdi_context *ftdic;
     int ret;
-    if (ftdi_init(ftdic) < 0)
+    
+    ftdic = ftdi_new();
+    if (!ftdic)
     {
         fprintf(stderr, "ftdi_init failed\n");
-        return EXIT_FAILURE;
+        return 0;
     }
 
     ret = ftdi_usb_open(ftdic, 0x0403, 0x6001);
     if( ret < 0 )
     {
         fprintf(stderr, "unable to open ftdi device: %d (%s)\n", ret, ftdi_get_error_string(ftdic));
-        return EXIT_FAILURE;
+        return 0;
     }
 
     ftdi_set_baudrate(ftdic, 250000);
 
-    return EXIT_SUCCESS;
+    return ftdic;
 }
 
 int opendmx_send(struct ftdi_context *ftdic, unsigned char *data)

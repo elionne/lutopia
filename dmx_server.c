@@ -11,21 +11,20 @@
 #include <arpa/inet.h>
 
 #include "dmx_server.h"
-#include "opendmx.h"
 
 /* this functions provides an easy way to use dmx protocol */
-int dmx_open(struct dmx_controler* dmx)
-{return dmx->dmx_open(dmx->dh);}
+dmx_handler dmx_open(struct dmx_controler* dmx, unsigned char* name)
+{return dmx->dmx_open(name);}
 
-int dmx_send(struct dmx_controler *dmx, unsigned char *data)
-{return dmx->dmx_send(dmx->dh, data);}
+int dmx_send(struct dmx_controler *dmx, dmx_handler handler, unsigned char *data)
+{return dmx->dmx_send(handler, data);}
 
-int dmx_close(struct dmx_controler *dmx)
-{return dmx->dmx_close(dmx->dh);}
+int dmx_close(struct dmx_controler *dmx, dmx_handler handler)
+{return dmx->dmx_close(handler);}
 
 int main(int argc, char* argv[])
 {
-
+    dmx_handler h;
     int s = socket(AF_INET, SOCK_DGRAM, 0);
     if(s <= 0 ){
         printf("Error while opening socket, abort. %s\n", strerror(errno));
@@ -46,7 +45,10 @@ int main(int argc, char* argv[])
     unsigned char dmx_data[513];
     int len = 0;
 
-    dmx_open(dmx_drv[0]);
+    h = dmx_open(dmx_drv_list[0], 0);
+    if(!h)
+      return EXIT_FAILURE;
+    
     do{
 
 /* send data at full speed rate or wait until data incoming to send to dmx */
@@ -73,14 +75,14 @@ int main(int argc, char* argv[])
         }
         dmx_data[0] = 0;
 
-        len = dmx_send(dmx_drv[0], dmx_data);
+        len = dmx_send(dmx_drv_list[0], h, dmx_data);
         if( len != 513)
             printf("send %i bytes to dmx\r", len);
 
 
     }while( 1 );
 
-    dmx_close(dmx_drv[0]);
+    dmx_close(dmx_drv_list[0], h);
 
     close(s);
     return EXIT_SUCCESS;

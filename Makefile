@@ -27,6 +27,6 @@ dmx_server: $(DMX_SERVER_OBJS)
 	$(CC) -o $@ $^ $(DMX_SERVER_LIBS)
 
 clean:
-	rm -f $(LUTOPIA_OBJS) $(DMX_SERVER_OBJS) $(DMX_DRV_DEF) dmx_drv_list.h lutopia dmx_server
+	$(RM) $(LUTOPIA_OBJS) $(DMX_SERVER_OBJS) $(DMX_DRV_DEF) dmx_drv_list.h lutopia dmx_server
 
 .PHONY: clean

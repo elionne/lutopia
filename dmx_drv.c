@@ -5,7 +5,7 @@
 #undef _
 
 #define _(drv) &drv,
-const struct dmx_controler *dmx_drv[] = {
+struct dmx_controler *dmx_drv_list[] = {
 #include "dmx_drv_list.h"
   0
 };
