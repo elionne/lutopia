@@ -69,7 +69,8 @@ int opendmx_close(struct ftdi_context *ftdic)
         return 1;
     }
 
-    ftdi_deinit(ftdic);
+    ftdi_free(ftdic);
+
     return 0;
 }
 
