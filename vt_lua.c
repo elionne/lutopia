@@ -252,6 +252,10 @@ int update_lights(lua_State *L, const char *universe, int dmx)
             }else
                 lua_pop(L, 2);
 
+        }else{
+            lua_pop(L, 1);
+            printf("Error: %s is not a light. Check assignement in your code\n",
+                   lua_tostring(L, -1));
         }
     }
     lua_pop(L, 1);
