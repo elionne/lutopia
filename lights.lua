@@ -54,16 +54,14 @@ function parled.new(addr, color)
     return new_light(parled, data);
 end
 
---[[
-spot = create_type_light();
+
+spot = {};
 
 function spot.new(addr)
-    local n = {addr=addr, value=0}
-    setmetatable(n, { __index = spot });
-    return n;
+    local data = {addr=addr, value=0};
+    return new_light(spot, data);
 end
 
 function spot:dmx()
-    return {addr=self.addr, [0] = value};
+    return {addr=self.addr, [0] = self.value*255};
 end
-]]--

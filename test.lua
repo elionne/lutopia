@@ -44,6 +44,11 @@ u.test1.hsv = u.test1.rgb:to_hsv()
 --end
 
 function main(p)
+    local pretty = function(p)
+        local nop, r = math.modf(p)
+        return linearize(triangle(r, 0.00, 1, 0.5))
+    end
+
     local spectre = function(p)
         u.test1.hsv.h = p
         nop, u.test2.hsv.h = math.modf(p + 0.05);
@@ -53,15 +58,27 @@ function main(p)
     end
 
     local wave = function(p)
-        u.test1.hsv.v = linearize(triangle(p, 0.00, 0.7, 0.1))
-        u.test1.rgb = rgb.from_hsv(u.test1.hsv)
+        --u.test1.hsv.v = pretty(p)
+        --u.test1.rgb = rgb.from_hsv(u.test1.hsv)
 
-        nop, p2 = math.modf(p + 0.25)
-        u.test2.hsv.v = linearize(triangle(p2, 0.00, 0.7, 0.1))
-        u.test2.rgb = rgb.from_hsv(u.test2.hsv)
+        --u.test2.hsv.v = pretty(p + 0.2)
+        --u.test2.rgb = rgb.from_hsv(u.test2.hsv)
+
+        u.spot2.value = pretty(p)
+        u.spot3.value = pretty(p + 0.33)
+        u.spot4.value = pretty(p + 0.66)
+
     end
 
     local flash = function(p)
+        local rand = function()
+            if math.random() > 0.95 then
+                return 1
+            else
+                return 0
+            end
+        end
+
         if math.random() > 0.95 then
             u.test1.hsv.v = 0.5
         else
@@ -75,7 +92,13 @@ function main(p)
             u.test2.hsv.v = 0
         end
         u.test2.rgb = rgb.from_hsv(u.test2.hsv)
+
+        u.spot1.value = rand();
+        u.spot2.value = rand();
+        u.spot3.value = rand();
+        u.spot4.value = rand();
     end
+
 
     local rgb_test = function(p)
         if p == 0 then
@@ -94,9 +117,9 @@ function main(p)
     u.test2.hsv = {h=0.2, s=1, v=1};
 
     --add_task(spectre, 0.002, 10, "spectre")
-    --add_task(wave, 0.01, 0.5, "wave")
+    add_task(wave, 0.01, 10, "wave")
     --add_task(flash, 1, 0.05, "flash")
-    add_task(rgb_test, 0.33, 1, "test")
+    --add_task(rgb_test, 0.33, 1, "test")
 
 
     start_task()

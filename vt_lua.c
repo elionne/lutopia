@@ -336,8 +336,12 @@ int main()
     err = lua_pcall(L, 0, LUA_MULTRET, 0);
     dbg_lua(L, err, "lights.lua");
 
-    new_light(L, 1, "u", "parled", "test1");
-    new_light(L, 6, "u", "parled", "test2");
+    new_light(L, 10, "u", "parled", "test1");
+    new_light(L, 5, "u", "parled", "test2");
+    new_light(L, 1, "u", "spot", "spot1");
+    new_light(L, 2, "u", "spot", "spot2");
+    new_light(L, 3, "u", "spot", "spot3");
+    new_light(L, 4, "u", "spot", "spot4");
 
     link_into_group(L, "u", "group1", "test1");
     link_into_group(L, "u", "group1", "test2");
