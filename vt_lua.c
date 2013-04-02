@@ -254,7 +254,7 @@ int update_lights(lua_State *L, const char *universe, int dmx)
 
         }else{
             lua_pop(L, 1);
-            printf("Error: %s is not a light. Check assignement in your code\n",
+            printf("Warning: %s is not a light. Check assignement in your code\n",
                    lua_tostring(L, -1));
         }
     }
@@ -262,7 +262,7 @@ int update_lights(lua_State *L, const char *universe, int dmx)
 
     int len = send(dmx, dmx_data, 513, 0);
     if( len != 513 ){
-        printf("socket error, too few data send, %i\n", len);
+        printf("socket error, too few data sent, %i\n", len);
         puts(strerror(errno));
         return 0;
     }

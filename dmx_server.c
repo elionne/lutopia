@@ -28,6 +28,7 @@ int main(int argc, char* argv[])
 {
     dmx_handler h;
     int s = socket(AF_INET, SOCK_DGRAM, 0);
+    
     if(s <= 0 ){
         printf("Error while opening socket, abort. %s\n", strerror(errno));
         return EXIT_FAILURE;
@@ -49,8 +50,52 @@ int main(int argc, char* argv[])
     if(!h)
       return EXIT_FAILURE;
 
+    struct timeval before, after, timeout = { 0, 24e3 };
     do{
-        exec(s, h);
+        unsigned char dmx_data[513];
+        int len = 0;
+        /* send data at full speed rate or wait until data incoming to send to dmx */
+        fd_set fd;
+        FD_ZERO(&fd);
+        FD_SET(s, &fd);
+
+        gettimeofday(&before, 0);
+
+        int error = select(s+1, &fd, 0, 0, &timeout);
+
+        gettimeofday(&after, 0);
+        if( error == 0 )
+            wake_up_task("popo");
+        else if( error > 0 )
+        {
+            /* flush the buffer, returns only the last packet sent */
+            int count = 0;
+            struct timeval flush = { 0, 0};
+            FD_ZERO(&fd);
+            FD_SET(s, &fd);
+            do{
+                len = recv(s, dmx_data, sizeof(dmx_data), 0);
+                count++;
+            }while( select(s+1, &fd, 0, 0, &flush ) > 0 );
+ 
+            if( len < sizeof(dmx_data) )
+                printf("corrupted data receive\n");
+            #if 1
+            if( count > 1 )
+                printf("multiple data received %i\n", count);
+            #endif
+
+            struct timeval timediff;
+            timersub(&after, &before, &timediff);
+            timersub(&timeout, &timediff, &timeout);
+
+        }
+        dmx_data[0] = 0;
+
+        len = dmx_send(dmx_drv_list[0], h, dmx_data);
+        if( len != 513)
+            printf("send %i bytes to dmx\r", len);
+
     }while(1);
 
     dmx_close(dmx_drv_list[0], h);
@@ -58,40 +103,19 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
 }
 
-int exec(int s, dmx_handler h)
+int wake_up_task(char* function)
+
 {
-    unsigned char dmx_data[513];
-    int len = 0;
-/* send data at full speed rate or wait until data incoming to send to dmx */
-    fd_set fd;
-    FD_ZERO(&fd);
-    FD_SET(s, &fd);
+    
+}
 
-    struct timeval timeout = { 0, 24e3 };
-    if( select(s+1, &fd, 0, 0, &timeout) > 0 )
-    {
-        /* flush the buffer, returns only the last packet sent */
-        int count = 0;
-        struct timeval flush = { 0, 0};
-        FD_ZERO(&fd);
-        FD_SET(s, &fd);
-        do{
-            len = recv(s, dmx_data, sizeof(dmx_data), 0);
-            count++;
-        }while( select(s+1, &fd, 0, 0, &flush ) > 0 );
+int gcd(int a, int b) {
 
-        if( len < sizeof(dmx_data) )
-            printf("corrupted data receive\n");
-#if 1
-        if( count > 1 )
-            printf("multiple data received %i\n", count);
-#endif
+    while(a != 0) {
+        int c = a;
+        a = b % a;
+        b = c;
     }
-    dmx_data[0] = 0;
 
-    len = dmx_send(dmx_drv_list[0], h, dmx_data);
-    if( len != 513)
-        printf("send %i bytes to dmx\r", len);
-
-    return 0;
+    return b;
 }
