@@ -50,8 +50,8 @@ int main(int argc, char* argv[])
     if(!h)
       return EXIT_FAILURE;
 
-    struct timeval before, after, timeout = { 0, 24e3 };
     do{
+        struct timeval before, after, timeout = { 0, 24e3 };
         unsigned char dmx_data[513];
         int len = 0;
         /* send data at full speed rate or wait until data incoming to send to dmx */
