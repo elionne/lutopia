@@ -114,10 +114,10 @@ function main(p)
     end
 
     u.test1.hsv = {h=1, s=1, v=1};
-    u.test2.hsv = {h=0.2, s=1, v=1};
+    u.test2.hsv = {h=1, s=1, v=1};
 
     --add_task(spectre, 0.002, 10, "spectre")
-    add_task(wave, 0.01, 10, "wave")
+    add_task(wave, 0.01, 3, "wave")
     --add_task(flash, 1, 0.05, "flash")
     --add_task(rgb_test, 0.33, 1, "test")
 
