@@ -157,7 +157,7 @@ void new_universe(lua_State *L, const char *universe)
 /* Light in use must be on the top of stack. when this function returns, current
  * light still on stack.
  */
-int send_dmx(lua_State *L, char *data)
+int send_dmx(lua_State *L, unsigned char *data)
 {
     int err;
     short start_addr;
@@ -275,7 +275,7 @@ int lt_update_lights(lua_State *L)
     const char *universe = lua_tostring(L, -1);
     lua_pop(L, 1);
 
-    update_lights(L, universe, dmx);
+    return update_lights(L, universe, dmx);
 }
 
 int lt_sleep(lua_State *L)
