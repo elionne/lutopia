@@ -86,7 +86,7 @@ function gradiant(left, right, pos, cross)
 end
 
 function linearize(value)
-    return math.pow(10, value - 1)
+    return math.pow(10, value*1.041392 - 1) - 0.1
 end
 
 function triangle(p, min, max, duty_cycle)
