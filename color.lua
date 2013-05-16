@@ -89,16 +89,56 @@ function linearize(value)
     return math.pow(10, value*1.041392 - 1) - 0.1
 end
 
-function triangle(p, min, max, duty_cycle)
+function triangle(p, offset, width, duty_cycle, min, max)
     duty_cycle = duty_cycle or 0.5
+    offset = offset or 0
+    width = width or 1
     max = max or 1
     min = min or 0
 
-    if p < duty_cycle then
+    -- Apply the scale
+    p = p * width
+
+    -- Transform p in radian
+    p = p * 2 * math.pi
+
+    local test, r
+    if offset == 0 then
+        test = true
+        r = p
+    end
+
+    -- Transform offset in phase (radian too)
+    offset = offset * 2 * math.pi
+
+    if math.asin(math.sin(p / width + offset)) >= math.pi / 2 then
+        return 0
+    end
+
+    -- Transform sawtooth wave in sin with shifting
+    p = math.sin(p)*math.cos(offset) + math.cos(p)*math.sin(offset)
+
+    -- Adjust it
+    p = math.asin(p) / math.pi + 0.5
+
+    if test then
+       r = math.asin(math.sin(r)) / math.pi + 0.5
+       --print(p, r)
+    end
+
+    if p < 0 then
+        return 0
+    elseif p > 1 then
+        return 0
+    end
+
+    return p
+
+    --[[
+    if p <= duty_cycle then
         return min + p * (max - min) / duty_cycle
     else
-        return min + (p - 1) * (min - max) / (1 - duty_cycle)
+        return min + (1 - p) * (max - min) / (1 - duty_cycle)
     end
+    --]]
 end
-
-

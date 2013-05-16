@@ -44,9 +44,8 @@ u.test1.hsv = u.test1.rgb:to_hsv()
 --end
 
 function main(p)
-    local pretty = function(p)
-        local nop, r = math.modf(p)
-        return linearize(triangle(r, 0.00, 1, 0.5))
+    local pretty = function(p, offset, width)
+        return linearize(triangle(p, offset, width))
     end
 
     local spectre = function(p)
@@ -61,12 +60,16 @@ function main(p)
         --u.test1.hsv.v = pretty(p)
         --u.test1.rgb = rgb.from_hsv(u.test1.hsv)
 
-        --u.test2.hsv.v = pretty(p + 0.2)
-        --u.test2.rgb = rgb.from_hsv(u.test2.hsv)
+        speed = 2
+        u.test2.hsv.v = pretty(p, 0.00, speed)
+        u.test2.rgb = rgb.from_hsv(u.test2.hsv)
 
-        u.spot2.value = pretty(p)
-        u.spot3.value = pretty(p + 0.33)
-        u.spot4.value = pretty(p + 0.66)
+        u.spot2.value = pretty(p, 0.25, speed)
+        u.spot3.value = pretty(p, 0.5, speed)
+        u.spot4.value = pretty(p, 0.75, speed)
+
+        print(triangle(p, 0.25, speed), u.test2.rgb:to_hsv().v, u.spot2.value, u.spot3.value, u.spot4.value)
+        --print(triangle(p, 0, speed), triangle(p, 0.5, speed))
 
     end
 
