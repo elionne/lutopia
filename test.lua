@@ -45,7 +45,8 @@ u.test1.hsv = u.test1.rgb:to_hsv()
 
 function main(p)
     local pretty = function(p, offset, width)
-        return linearize(triangle(p, offset, width))
+        p = shift(p, offset)
+        return linearize(triangle(p, width))
     end
 
     local spectre = function(p)
@@ -56,11 +57,17 @@ function main(p)
         u.test2.rgb = rgb.from_hsv(u.test2.hsv)
     end
 
-    local wave = function(p)
+    local wave = {}
+    local wave_mt = {}
+
+    wave_mt.lights = {}
+    wave_mt.__call = function(func, ...)
+        p = ...
+
         --u.test1.hsv.v = pretty(p)
         --u.test1.rgb = rgb.from_hsv(u.test1.hsv)
 
-        speed = 2
+        speed = 1.0
         u.test2.hsv.v = pretty(p, 0.00, speed)
         u.test2.rgb = rgb.from_hsv(u.test2.hsv)
 
@@ -68,9 +75,14 @@ function main(p)
         u.spot3.value = pretty(p, 0.5, speed)
         u.spot4.value = pretty(p, 0.75, speed)
 
-        print(triangle(p, 0.25, speed), u.test2.rgb:to_hsv().v, u.spot2.value, u.spot3.value, u.spot4.value)
+        --print(pretty(p, 0.00, speed), u.spot2.value, u.spot3.value, u.spot4.value)
         --print(triangle(p, 0, speed), triangle(p, 0.5, speed))
 
+    end
+    setmetatable(wave, wave_mt)
+
+    wave.add = function(self, light)
+        table.insert(getmetatable().lights, light)
     end
 
     local flash = function(p)
@@ -103,7 +115,7 @@ function main(p)
     end
 
 
-    local rgb_test = function(p)
+    local cue_test = function(p)
         if p == 0 then
             set_cue(cue.seq4)
         elseif p < 1/3 then
@@ -116,13 +128,26 @@ function main(p)
         --export_to_lua(u, "u");
     end
 
+    local laser_test = function(p)
+        u.laser1.value = 240/255
+        u.laser2.value = p
+        u.laser3.value = 0
+        u.laser4.value = 50/255
+        u.laser5.value = 0/255
+        u.laser6.value = 0/255
+
+        print( p *255 )
+    end
+
+
     u.test1.hsv = {h=1, s=1, v=1};
-    u.test2.hsv = {h=1, s=1, v=1};
+    u.test2.hsv = {h=0.52, s=1, v=1};
 
     --add_task(spectre, 0.002, 10, "spectre")
     add_task(wave, 0.01, 3, "wave")
+    --add_task(laser_test, 0.01, 100, "laser_test")
     --add_task(flash, 1, 0.05, "flash")
-    --add_task(rgb_test, 0.33, 1, "test")
+    --add_task(cue_test, 0.33, 1, "test")
 
 
     start_task()

@@ -89,9 +89,37 @@ function linearize(value)
     return math.pow(10, value*1.041392 - 1) - 0.1
 end
 
-function triangle(p, offset, width, duty_cycle, min, max)
+math.two_pi = 2 * math.pi
+
+function shift(p, offset)
+    -- Transform p in radian
+    p = p * math.two_pi
+
+    -- Transform offset in phase (radian too)
+    offset = offset * math.two_pi
+
+    cosf, sinf = math.cos(p), math.sin(p)
+    coso, sino = math.cos(offset), math.sin(offset)
+
+    -- Transform sawtooth wave into sin and cos with shifting
+    sinp = sinf*coso + cosf*sino
+    cosp = cosf*coso - sinf*sino
+
+    -- This part transform cos and sin of input to a sawtooth.
+    -- Needs three different calculation section
+    if sinp >= 0 and cosp >= 0 then
+        p = math.asin(sinp)/math.two_pi
+    elseif sinp >= 0 then
+        p = math.acos(cosp)/math.two_pi
+    else
+        p = math.asin(cosp)/math.two_pi + 0.75
+    end
+
+    return p
+end
+
+function triangle(p, width, duty_cycle, min, max)
     duty_cycle = duty_cycle or 0.5
-    offset = offset or 0
     width = width or 1
     max = max or 1
     min = min or 0
@@ -99,46 +127,13 @@ function triangle(p, offset, width, duty_cycle, min, max)
     -- Apply the scale
     p = p * width
 
-    -- Transform p in radian
-    p = p * 2 * math.pi
-
-    local test, r
-    if offset == 0 then
-        test = true
-        r = p
+    if p > 1 or p < 0 then
+        p = 0
     end
 
-    -- Transform offset in phase (radian too)
-    offset = offset * 2 * math.pi
-
-    if math.asin(math.sin(p / width + offset)) >= math.pi / 2 then
-        return 0
-    end
-
-    -- Transform sawtooth wave in sin with shifting
-    p = math.sin(p)*math.cos(offset) + math.cos(p)*math.sin(offset)
-
-    -- Adjust it
-    p = math.asin(p) / math.pi + 0.5
-
-    if test then
-       r = math.asin(math.sin(r)) / math.pi + 0.5
-       --print(p, r)
-    end
-
-    if p < 0 then
-        return 0
-    elseif p > 1 then
-        return 0
-    end
-
-    return p
-
-    --[[
     if p <= duty_cycle then
         return min + p * (max - min) / duty_cycle
     else
         return min + (1 - p) * (max - min) / (1 - duty_cycle)
     end
-    --]]
 end
