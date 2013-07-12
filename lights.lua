@@ -62,6 +62,10 @@ function spot.new(addr)
     return new_light(spot, data);
 end
 
+function spot:set_value(v)
+    self.value = v
+end
+
 function spot:dmx()
     return {addr=self.addr, [0] = self.value*255};
 end
