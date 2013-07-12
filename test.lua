@@ -101,19 +101,11 @@ function main(p)
         end
         u.test1.rgb = rgb.from_hsv(u.test1.hsv)
 
-        if math.random() > 0.95 then
-            u.test2.hsv.v = 0.5
-        else
-            u.test2.hsv.v = 0
-        end
-        u.test2.rgb = rgb.from_hsv(u.test2.hsv)
-
         u.spot1.value = rand();
         u.spot2.value = rand();
         u.spot3.value = rand();
         u.spot4.value = rand();
     end
-
 
     local cue_test = function(p)
         if p == 0 then
@@ -128,24 +120,12 @@ function main(p)
         --export_to_lua(u, "u");
     end
 
-    local laser_test = function(p)
-        u.laser1.value = 240/255
-        u.laser2.value = p
-        u.laser3.value = 0
-        u.laser4.value = 50/255
-        u.laser5.value = 0/255
-        u.laser6.value = 0/255
-
-        print( p *255 )
-    end
-
 
     u.test1.hsv = {h=1, s=1, v=1};
     u.test2.hsv = {h=0.52, s=1, v=1};
 
     --add_task(spectre, 0.002, 10, "spectre")
     add_task(wave, 0.01, 3, "wave")
-    --add_task(laser_test, 0.01, 100, "laser_test")
     --add_task(flash, 1, 0.05, "flash")
     --add_task(cue_test, 0.33, 1, "test")
 
