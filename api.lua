@@ -183,11 +183,11 @@ function new_light(class, priv)
         return rawget(class, key)
     end
 
-    class.ack = function(self)
+    priv.ack = function(self)
         getmetatable(self).changed = false;
     end
 
-    class.is_changed = function(self)
+    priv.is_changed = function(self)
         return getmetatable(self).changed;
     end
 
