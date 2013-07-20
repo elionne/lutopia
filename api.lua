@@ -20,6 +20,30 @@ function clone(object)
     end
     return _copy(object)
 end
+-- This a simple, naive implementation. It only copies the top level value and
+-- its direct children; there is no handling of deeper children, metatables or
+-- special types such as userdata or coroutines. It is also susceptible to
+-- influence by the __pairs metamethod.
+--
+-- from http://lua-users.org/wiki/CopyTable
+function shallowcopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in pairs(orig) do
+            copy[orig_key] = orig_value
+        end
+    else -- number, string, boolean, etc
+    copy = orig
+end
+return copy
+end
+
+-- Alias for shallowcopy
+function inherit(super)
+    return shallowcopy(super)
+end
 
 -- Print anything - including nested tables
 function table_print (tt, indent, done)
