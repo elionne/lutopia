@@ -65,3 +65,21 @@ end
 function spot:dmx()
     return {addr=self.addr, [0] = self.value*255};
 end
+
+
+lspot = inherit(spot)
+
+function lspot:set_value(v)
+    self.lin = linearize(v)
+end
+
+function lspot:get_value()
+    return self.lin
+end
+
+function lspot.new(addr)
+    local data = {addr = addr, lin = 0}
+    return new_light(lspot, data)
+end
+
+
