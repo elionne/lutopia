@@ -342,16 +342,10 @@ int main()
 
     new_light(L, 30, "u", "parled", "test1");
     new_light(L, 5, "u", "parled", "test2");
-    new_light(L, 1, "u", "spot", "spot1");
-    new_light(L, 2, "u", "spot", "spot2");
-    new_light(L, 3, "u", "spot", "spot3");
-    new_light(L, 4, "u", "spot", "spot4");
-    new_light(L, 11, "u", "spot", "laser1");
-    new_light(L, 12, "u", "spot", "laser2");
-    new_light(L, 13, "u", "spot", "laser3");
-    new_light(L, 14, "u", "spot", "laser4");
-    new_light(L, 15, "u", "spot", "laser5");
-    new_light(L, 16, "u", "spot", "laser6");
+    new_light(L, 1, "u", "lspot", "spot1");
+    new_light(L, 2, "u", "lspot", "spot2");
+    new_light(L, 3, "u", "lspot", "spot3");
+    new_light(L, 4, "u", "lspot", "spot4");
 
 
     link_into_group(L, "u", "group1", "test1");

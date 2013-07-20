@@ -26,10 +26,10 @@ off = rgb.new(0, 0, 0);
 --u.test1.rgb = off
 print('u.test1', u.test1);
 
-u.test2.rgb = rgb.new(255/255, 105/255, 180/255)
+u.test2.rgb = off
 u.test2.hsv = u.test2.rgb:to_hsv()
 
-u.test1.rgb = rgb.new(1, 1, 1)
+u.test1.rgb = off
 u.test1.hsv = u.test1.rgb:to_hsv()
 
 --for k,v in pairs(u.test1) do print(k, v) end
@@ -46,7 +46,7 @@ u.test1.hsv = u.test1.rgb:to_hsv()
 function main(p)
     local pretty = function(p, offset, width)
         p = shift(p, offset)
-        return linearize(triangle(p, width))
+        return triangle(p, width)
     end
 
     local spectre = function(p)
@@ -61,19 +61,25 @@ function main(p)
     local wave_mt = {}
 
     wave_mt.lights = {}
-    wave_mt.__call = function(func, ...)
-        p = ...
+    wave_mt.__call = function(self, ...)
+        p, total_time, step = ...
 
         --u.test1.hsv.v = pretty(p)
         --u.test1.rgb = rgb.from_hsv(u.test1.hsv)
 
-        speed = 1.0
-        u.test2.hsv.v = pretty(p, 0.00, speed)
-        u.test2.rgb = rgb.from_hsv(u.test2.hsv)
+        local lights = getmetatable(self).lights
+        local len = #lights
 
-        u.spot2.value = pretty(p, 0.25, speed)
-        u.spot3.value = pretty(p, 0.5, speed)
-        u.spot4.value = pretty(p, 0.75, speed)
+        speed = 1
+        for index, light in pairs(lights) do
+            light.value = pretty(p, index / len, speed)
+        end
+        --u.test2.hsv.v = pretty(p, 0.00, speed)
+        --u.test2.rgb = rgb.from_hsv(u.test2.hsv)
+
+        --u.spot2.value = pretty(p, 0.25, speed)
+        --u.spot3.value = pretty(p, 0.5, speed)
+        --u.spot4.value = pretty(p, 0.75, speed)
 
         --print(pretty(p, 0.00, speed), u.spot2.value, u.spot3.value, u.spot4.value)
         --print(triangle(p, 0, speed), triangle(p, 0.5, speed))
@@ -82,7 +88,8 @@ function main(p)
     setmetatable(wave, wave_mt)
 
     wave.add = function(self, light)
-        table.insert(getmetatable().lights, light)
+        local lights = getmetatable(self).lights
+        table.insert(lights, light)
     end
 
     local flash = function(p)
@@ -123,6 +130,12 @@ function main(p)
 
     u.test1.hsv = {h=1, s=1, v=1};
     u.test2.hsv = {h=0.52, s=1, v=1};
+
+    wave:add(u.spot2)
+    wave:add(u.spot3)
+    wave:add(u.spot4)
+    wave:add(u.test2)
+    wave:add(u.test1)
 
     --add_task(spectre, 0.002, 10, "spectre")
     add_task(wave, 0.01, 3, "wave")
