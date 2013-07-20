@@ -99,7 +99,7 @@ function rt_time()
     local sleep_time = math.min(current.time, current.total_time * current.step)
     usleep(sleep_time*1e6)
 
-    current.func(current.p)
+    current.func(current.p, current.total_time, current.step)
     --print_tasks()
     current.p = current.p + current.step
     if current.p > 1 then current.p = 0 end
@@ -129,7 +129,7 @@ function start_task(func)
     add_task(function(p) print("h", p) end, 0.05, 2, "h")
     add_task(function(p) print("i", p) end, 0.1, 1, "i")
 ]]
-   
+
     rt_time()
 
 end
