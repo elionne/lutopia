@@ -86,7 +86,11 @@ function gradiant(left, right, pos, cross)
 end
 
 function linearize(value)
-    return math.pow(10, value*1.041392 - 1) - 0.1
+    return math.pow(10, value*1.0413927 - 1) - 0.1 -- 1.0413927… = log(11, 10)
+end
+
+function delinearize(value)
+    return math.log(value*9 + 1, 10)
 end
 
 math.two_pi = 2 * math.pi
