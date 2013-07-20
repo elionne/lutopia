@@ -23,12 +23,12 @@ require "color"
 -- first implemented light type
 parled = {};
 
-function parled:value()
+function parled:get_value()
     return math.max(self.rgb.r, self.rgb.g, self.rgb.b)
 end
 
 function parled:set_value(v)
-    self.rgb = self.rgb:from_hsv({v=v})
+    self.rgb = rgb.from_hsv({v=linearize(v)}, self.rgb)
 end
 
 function parled:set(rgb)
@@ -60,10 +60,6 @@ spot = {};
 function spot.new(addr)
     local data = {addr=addr, value=0};
     return new_light(spot, data);
-end
-
-function spot:set_value(v)
-    self.value = v
 end
 
 function spot:dmx()
