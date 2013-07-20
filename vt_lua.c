@@ -33,8 +33,12 @@ void dbg_lua(lua_State *L, int err, const char *msg)
                 printf("memory allocation error\n");
                 exit(-1);
             case LUA_ERRRUN:
+            {
+                const char * msg = lua_tostring(L, -1);
+                luaL_traceback(L, L, msg, 1);
                 printf("%s\n", lua_tostring(L, -1));
                 exit(-1);
+            }
             case LUA_ERRERR:
                 printf("error while running the error handler function\n");
                 exit(-1);
@@ -225,6 +229,7 @@ int update_lights(lua_State *L, const char *universe, int dmx)
 
             lua_getfield(L, -1, "is_changed");
             if( lua_isnil(L, -1) ){
+
                 lua_pop(L, 2);
                 continue;
             }
