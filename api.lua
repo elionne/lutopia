@@ -133,15 +133,54 @@ end
 
 -- The table pirv will be added to class table like private data
 function new_light(class, priv)
-    -- setter will be called every time you write somethings in priv
+    -- The new light is an empty table. All works with the metatable
+    local new_light = {}
+
+    -- setter will be called every time you write somethings in new_light
+    local catch_changes = function(self, key, value)
+        getmetatable(self).changed = true
+        priv[key] = value
+    end
+
     local setter = function(self, key, value)
-        if( type(value) == "function" ) then
-            rawset(new_type, key, value);
-            return;
+     -- Treat 'value' key has a special key. Test if set_value function is
+     -- present, if true call this function to set value appropriatly otherwise
+     -- set the new value to priv.value.
+        if key == "value" then
+            local v = rawget(class, "set_value")
+            if v ~= nil then
+                v(self, value)
+                return
+            else
+                rawset(priv, "value", value)
+                return
+            end
         end
+
         --last = clone(priv);
-        priv[key] = value;
-        getmetatable(self).changed = true;
+
+        -- The user can’t change the behavior of class
+        --class[key] = value
+    end
+
+    local getter = function(self, key)
+     -- Treat 'value' key has a special key. Test if get_value function is
+     -- present, if true return the result of this function otherwise return
+     -- 'value' key its self.
+        if key == "value" then
+            local v = rawget(class, "get_value")
+            if v ~= nil then
+                return v(self)
+            else
+                if rawget(priv, "value") ~= nil then
+                    return rawget(priv, "value")
+                else
+                    return 0
+                end
+            end
+        end
+
+        return rawget(class, key)
     end
 
     class.ack = function(self)
@@ -152,17 +191,17 @@ function new_light(class, priv)
         return getmetatable(self).changed;
     end
 
-    setmetatable(priv, {__index = class} );
+    setmetatable(priv, {__index = getter, __newindex = setter} );
     local new_light_mt = {
         __index = priv,
-        __newindex = setter,
+        __newindex = catch_changes,
         __tostring = class.tostring,
         priv = priv,
         --last = clone(priv),
         changed = false
     }
 
-    return setmetatable({}, new_light_mt);
+    return setmetatable(new_light, new_light_mt);
 end
 
 function set_cue(seq)
