@@ -28,6 +28,8 @@ void dbg_lua(lua_State *L, int err, const char *msg)
                 exit(-1);
             case LUA_ERRSYNTAX:
                 printf("syntax error during pre-compilation\n");
+                luaL_traceback(L, L, msg, 1);
+                printf("%s\n", lua_tostring(L, -1));
                 exit(-1);
             case LUA_ERRMEM:
                 printf("memory allocation error\n");
