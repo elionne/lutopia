@@ -57,62 +57,62 @@ function main(p)
         u.test2.rgb = rgb.from_hsv(u.test2.hsv)
     end
 
+    ---- Wave
     local wave = {}
     local wave_mt = {}
 
-    wave_mt.lights = {}
+    wave_mt.__index = wave
     wave_mt.__call = function(self, ...)
         p, total_time, step = ...
 
         --u.test1.hsv.v = pretty(p)
         --u.test1.rgb = rgb.from_hsv(u.test1.hsv)
 
-        local lights = getmetatable(self).lights
-        local len = #lights
+        local len = #self.lights
 
-        speed = 1
-        for index, light in pairs(lights) do
-            light.value = pretty(p, index / len, speed)
+        for index, light in pairs(self.lights) do
+            light.value = pretty(p, index / len, self.speed)
         end
-        --u.test2.hsv.v = pretty(p, 0.00, speed)
-        --u.test2.rgb = rgb.from_hsv(u.test2.hsv)
-
-        --u.spot2.value = pretty(p, 0.25, speed)
-        --u.spot3.value = pretty(p, 0.5, speed)
-        --u.spot4.value = pretty(p, 0.75, speed)
-
-        --print(pretty(p, 0.00, speed), u.spot2.value, u.spot3.value, u.spot4.value)
-        --print(triangle(p, 0, speed), triangle(p, 0.5, speed))
-
     end
-    setmetatable(wave, wave_mt)
 
     wave.add = function(self, light)
-        local lights = getmetatable(self).lights
-        table.insert(lights, light)
+        table.insert(self.lights, light)
+        self.speed = #self.lights
     end
 
-    local flash = function(p)
+    wave.new = function(speed)
+        return setmetatable({lights={}, speed=speed or 1}, wave_mt)
+    end
+    -----
+
+    ---- Flash
+    local flash = {}
+    local flash_mt = {}
+
+    flash_mt.__index = flash
+    flash_mt.__call = function(self, ...)
+        p, total_time, step = ...
         local rand = function()
-            if math.random() > 0.95 then
+            if math.random() > self.rate then
                 return 1
             else
                 return 0
             end
         end
 
-        if math.random() > 0.95 then
-            u.test1.hsv.v = 0.5
-        else
-            u.test1.hsv.v = 0
+        for index, light in pairs(self.lights) do
+            light.value = (light.value > 0.5) * rand()
         end
-        u.test1.rgb = rgb.from_hsv(u.test1.hsv)
-
-        u.spot1.value = rand();
-        u.spot2.value = rand();
-        u.spot3.value = rand();
-        u.spot4.value = rand();
     end
+
+    flash.add = function(self, light)
+        table.insert(self.lights, light)
+    end
+
+    flash.new = function(rate)
+        return setmetatable({lights={}, rate=rate or 0.90}, flash_mt)
+    end
+    ----
 
     local cue_test = function(p)
         if p == 0 then
@@ -131,15 +131,18 @@ function main(p)
     u.test1.hsv = {h=1, s=1, v=1};
     u.test2.hsv = {h=0.52, s=1, v=1};
 
-    wave:add(u.spot2)
-    wave:add(u.spot3)
-    wave:add(u.spot4)
-    wave:add(u.test2)
-    wave:add(u.test1)
+    wave1 = wave.new()
+    flash1 = flash.new(0.92)
 
-    --add_task(spectre, 0.002, 10, "spectre")
-    add_task(wave, 0.01, 3, "wave")
-    --add_task(flash, 1, 0.05, "flash")
+    flash1:add(u.spot2)
+    flash1:add(u.spot3)
+    flash1:add(u.spot4)
+    flash1:add(u.test2)
+    flash1:add(u.test1)
+
+    --add_task(spectre, 0.01, 30, "spectre")
+    add_task(flash1, 1, 0.05, "flash")
+    add_task(wave1, 0.01, 3, "wave")
     --add_task(cue_test, 0.33, 1, "test")
 
 
