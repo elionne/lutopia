@@ -50,11 +50,8 @@ function main(p)
     end
 
     local spectre = function(p)
-        u.test1.hsv.h = p
-        nop, u.test2.hsv.h = math.modf(p + 0.05);
-
-        u.test1.rgb = rgb.from_hsv(u.test1.hsv)
-        u.test2.rgb = rgb.from_hsv(u.test2.hsv)
+        u.test1.rgb = rgb.from_hsv({h=p, s=1}, u.test1.rgb)
+        u.test2.rgb = rgb.from_hsv({h=shift(p, 0.1), s=1}, u.test2.rgb)
     end
 
     ---- Wave
