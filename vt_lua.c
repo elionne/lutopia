@@ -11,6 +11,7 @@
 
 /* lua includes */
 #include <lua.h>
+#include <lualib.h>
 #include <lauxlib.h>
 
 #define LIGHT "light"

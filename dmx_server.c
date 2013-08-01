@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 {
     dmx_handler h;
     int s = socket(AF_INET, SOCK_DGRAM, 0);
-    
+
     if(s <= 0 ){
         printf("Error while opening socket, abort. %s\n", strerror(errno));
         return EXIT_FAILURE;
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
                 len = recv(s, dmx_data, sizeof(dmx_data), 0);
                 count++;
             }while( select(s+1, &fd, 0, 0, &flush ) > 0 );
- 
+
             if( len < sizeof(dmx_data) )
                 printf("corrupted data receive\n");
             #if 1
@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
 int wake_up_task(char* function)
 
 {
-    
+    return 0;
 }
 
 int gcd(int a, int b) {
